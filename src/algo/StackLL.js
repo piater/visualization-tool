@@ -41,15 +41,15 @@ const LINKED_LIST_LINE_SPACING = 100;
 
 const TOP_POS_X = 180;
 const TOP_POS_Y = 100;
-const TOP_LABEL_X = 130;
+const TOP_LABEL_X = 120;
 const TOP_LABEL_Y = 100;
 
 const TOP_ELEM_WIDTH = 30;
 const TOP_ELEM_HEIGHT = 30;
 
-const PUSH_LABEL_X = 50;
+const PUSH_LABEL_X = 100;
 const PUSH_LABEL_Y = 30;
-const PUSH_ELEMENT_X = 120;
+const PUSH_ELEMENT_X = 200;
 const PUSH_ELEMENT_Y = 30;
 
 const SIZE = 32;

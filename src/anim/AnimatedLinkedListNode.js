@@ -258,7 +258,7 @@ export default class AnimatedLinkedListNode extends AnimatedObject {
 		}
 
 		context.textAlign = 'center';
-		context.font = '12px Arial';
+		context.font = '24px Arial';
 		context.textBaseline = 'middle';
 		context.lineWidth = 2;
 
