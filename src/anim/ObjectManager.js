@@ -61,7 +61,6 @@ export default class ObjectManager {
 		this.height = 0;
 		this.statusReport = new AnimatedLabel(-1, 'XXX', false, 30);
 		this.statusReport.x = 30;
-		this.statusReport.alpha = 0; // Justus: make invisible
 	}
 
 	draw() {
@@ -134,7 +133,7 @@ export default class ObjectManager {
 				}
 			}
 		}
-		this.statusReport.draw(this.ctx); // Justus: omit in c2s
+		// this.statusReport.draw(this.ctx); // Justus: omit
 	}
 
 	update() {}
