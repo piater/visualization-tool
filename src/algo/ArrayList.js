@@ -43,9 +43,9 @@ const ARRAY_ELEM_HEIGHT = 50;
 const ARRAY_ELEMS_PER_LINE = 14;
 const ARRAY_LINE_SPACING = 130;
 
-const PUSH_LABEL_X = 50;
+const PUSH_LABEL_X = 100;	// Justus
 const PUSH_LABEL_Y = 30;
-const PUSH_ELEMENT_X = 120;
+const PUSH_ELEMENT_X = 200;	// Justus
 const PUSH_ELEMENT_Y = 30;
 const PUSH_RESIZE_LABEL_X = 60;
 const PUSH_RESIZE_LABEL_Y = 60;
@@ -212,7 +212,7 @@ export default class ArrayList extends Algorithm {
 				ypos,
 			);
 			this.cmd(act.createLabel, this.arrayLabelID[i], i, xpos, ypos + ARRAY_ELEM_HEIGHT);
-			this.cmd(act.setForegroundColor, this.arrayLabelID[i], '#0000FF');
+			this.cmd(act.setForegroundColor, this.arrayLabelID[i], '#668721');
 		}
 
 		this.highlight1ID = this.nextIndex++;
@@ -358,7 +358,7 @@ export default class ArrayList extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			this.highlight1ID,
-			'#0000FF',
+			'#668721',
 			PUSH_ELEMENT_X,
 			PUSH_ELEMENT_Y,
 		);
@@ -400,7 +400,7 @@ export default class ArrayList extends Algorithm {
 		const xpos = (index % ARRAY_ELEMS_PER_LINE) * ARRAY_ELEM_WIDTH + ARRAY_START_X;
 		const ypos = Math.floor(index / ARRAY_ELEMS_PER_LINE) * ARRAY_LINE_SPACING + ARRAY_START_Y;
 
-		this.cmd(act.createHighlightCircle, this.highlight1ID, '#0000FF', xpos, ypos);
+		this.cmd(act.createHighlightCircle, this.highlight1ID, '#668721', xpos, ypos);
 		this.cmd(act.createLabel, labPopValID, this.arrayData[index], xpos, ypos);
 		this.cmd(act.setText, this.arrayID[index], '');
 		this.cmd(act.move, this.highlight1ID, xpos, ypos - 100);
