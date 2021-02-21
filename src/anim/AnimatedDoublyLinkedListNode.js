@@ -202,7 +202,7 @@ export default class AnimatedDoublyLinkedListNode extends AnimatedObject {
 
 		// Label
 		context.textAlign = 'center';
-		context.font = '12px Arial';
+		context.font = '24px Arial';
 		context.textBaseline = 'middle';
 		context.lineWidth = 2;
 		this.resetTextPosition();
