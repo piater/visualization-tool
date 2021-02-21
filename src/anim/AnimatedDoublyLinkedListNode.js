@@ -155,12 +155,10 @@ export default class AnimatedDoublyLinkedListNode extends AnimatedObject {
 			context.lineTo(startX - this.highlightDiff, startY - this.highlightDiff);
 			context.closePath();
 			context.stroke();
-			context.fill();
 		}
 
 		// Node edges
 		context.strokeStyle = this.foregroundColor;
-		context.fillStyle = this.backgroundColor;
 
 		context.beginPath();
 		context.moveTo(startX, startY);
@@ -170,7 +168,6 @@ export default class AnimatedDoublyLinkedListNode extends AnimatedObject {
 		context.lineTo(startX, startY);
 		context.closePath();
 		context.stroke();
-		context.fill();
 
 		context.lineWidth = 1;
 		// Left inner line between node and pointer area
