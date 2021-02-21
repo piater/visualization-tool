@@ -75,7 +75,7 @@ export default class DoublyLinkedList extends Algorithm {
 			this.addValueField,
 			() => this.addIndexCallback(),
 			4,
-			true,
+			false,
 		);
 		this.controls.push(this.addValueField);
 
@@ -218,7 +218,7 @@ export default class DoublyLinkedList extends Algorithm {
 
 	addIndexCallback() {
 		if (this.addValueField.value !== '' && this.addIndexField.value !== '') {
-			const addVal = parseInt(this.addValueField.value);
+			const addVal = this.addValueField.value;
 			const index = parseInt(this.addIndexField.value);
 			if (index >= 0 && index <= this.size) {
 				this.addValueField.value = '';
@@ -230,7 +230,7 @@ export default class DoublyLinkedList extends Algorithm {
 
 	addFrontCallback() {
 		if (this.addValueField.value !== '') {
-			const addVal = parseInt(this.addValueField.value);
+			const addVal = this.addValueField.value;
 			this.addValueField.value = '';
 			this.implementAction(this.add.bind(this), addVal, 0);
 		}
@@ -238,7 +238,7 @@ export default class DoublyLinkedList extends Algorithm {
 
 	addBackCallback() {
 		if (this.addValueField.value !== '') {
-			const addVal = parseInt(this.addValueField.value);
+			const addVal = this.addValueField.value;
 			this.addValueField.value = '';
 			this.implementAction(this.add.bind(this), addVal, this.size);
 		}
