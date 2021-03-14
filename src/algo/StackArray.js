@@ -132,7 +132,7 @@ export default class StackArray extends Algorithm {
 				ypos,
 			);
 			this.cmd(act.createLabel, this.arrayLabelID[i], i, xpos, ypos + ARRAY_ELEM_HEIGHT);
-			this.cmd(act.setForegroundColor, this.arrayLabelID[i], '#96c736'); // Justus
+			this.cmd(act.setForegroundColor, this.arrayLabelID[i], '#668721'); // Justus
 		}
 		this.cmd(act.createLabel, this.topLabelID, 'Size', TOP_LABEL_X, TOP_LABEL_Y);
 		this.cmd(
@@ -217,7 +217,7 @@ export default class StackArray extends Algorithm {
 		this.cmd(act.createLabel, labPushValID, elemToPush, PUSH_ELEMENT_X, PUSH_ELEMENT_Y);
 
 		this.cmd(act.step);
-		this.cmd(act.createHighlightCircle, this.highlight1ID, '#96c736', TOP_POS_X, TOP_POS_Y); // Justus
+		this.cmd(act.createHighlightCircle, this.highlight1ID, '#668721', TOP_POS_X, TOP_POS_Y); // Justus
 		this.cmd(act.step);
 
 		const xpos = (this.top % ARRAY_ELEMS_PER_LINE) * ARRAY_ELEM_WIDTH + ARRAY_START_X;
@@ -271,7 +271,7 @@ export default class StackArray extends Algorithm {
 		this.cmd(act.step);
 		this.cmd(act.setHighlight, this.topID, 0);
 
-		this.cmd(act.createHighlightCircle, this.highlight1ID, '#96c736', TOP_POS_X, TOP_POS_Y); // Justus
+		this.cmd(act.createHighlightCircle, this.highlight1ID, '#668721', TOP_POS_X, TOP_POS_Y); // Justus
 		this.cmd(act.step);
 
 		const xpos = (this.top % ARRAY_ELEMS_PER_LINE) * ARRAY_ELEM_WIDTH + ARRAY_START_X;
