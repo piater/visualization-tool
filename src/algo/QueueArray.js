@@ -37,22 +37,22 @@ const ARRAY_LINE_SPACING = 130;
 
 const FRONT_POS_X = 180;
 const FRONT_POS_Y = 100;
-const FRONT_LABEL_X = 130;
+const FRONT_LABEL_X = 110;
 const FRONT_LABEL_Y = 100;
 
-const SIZE_POS_X = 280;
+const SIZE_POS_X = 330;
 const SIZE_POS_Y = 100;
-const SIZE_LABEL_X = 230;
+const SIZE_LABEL_X = 270;
 const SIZE_LABEL_Y = 100;
 
-const QUEUE_LABEL_X = 60;
-const QUEUE_LABEL_Y = 30;
-const QUEUE_ELEMENT_X = 130;
-const QUEUE_ELEMENT_Y = 30;
+const QUEUE_LABEL_X = 120;
+const QUEUE_LABEL_Y = 20;
+const QUEUE_ELEMENT_X = 240;
+const QUEUE_ELEMENT_Y = 20;
 
-const QUEUE_INDEX_X = 129;
+const QUEUE_INDEX_X = 280;
 const QUEUE_INDEX_Y = 50;
-const QUEUE_INDEXVAL_X = 260;
+const QUEUE_INDEXVAL_X = 560;
 const QUEUE_INDEXVAL_Y = 50;
 
 const RESIZE_ARRAY_START_X = 100;
@@ -60,11 +60,11 @@ const RESIZE_ARRAY_START_Y = 300;
 const QUEUE_RESIZE_LABEL_X = 60;
 const QUEUE_RESIZE_LABEL_Y = 60;
 
-const INDEX_COLOR = '#0000FF';
+const INDEX_COLOR = '#668721';	// Justus
 
 const FRONT_LABEL_OFFSET = -40;
 
-const SIZE = 7;
+const SIZE = 8;			// Justus
 const MAX_SIZE = 30;
 
 export default class QueueArray extends Algorithm {
