@@ -53,7 +53,7 @@ export default class AnimatedLabel extends AnimatedObject {
 		if (!this.addedToScene) return;
 
 		context.globalAlpha = this.alpha;
-		context.font = '12px Arial';
+		context.font = '24px DejaVu Sans'; // Justus
 
 		let startingXForHighlight = this.x;
 

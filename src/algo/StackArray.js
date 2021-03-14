@@ -39,12 +39,12 @@ const ARRAY_LINE_SPACING = 130;
 
 const TOP_POS_X = 180;
 const TOP_POS_Y = 100;
-const TOP_LABEL_X = 130;
+const TOP_LABEL_X = 120;	// Justus
 const TOP_LABEL_Y = 100;
 
-const PUSH_LABEL_X = 50;
+const PUSH_LABEL_X = 150;	// Justus
 const PUSH_LABEL_Y = 30;
-const PUSH_ELEMENT_X = 120;
+const PUSH_ELEMENT_X = 250;	// Justus
 const PUSH_ELEMENT_Y = 30;
 const PUSH_RESIZE_LABEL_X = 60;
 const PUSH_RESIZE_LABEL_Y = 60;
@@ -132,7 +132,7 @@ export default class StackArray extends Algorithm {
 				ypos,
 			);
 			this.cmd(act.createLabel, this.arrayLabelID[i], i, xpos, ypos + ARRAY_ELEM_HEIGHT);
-			this.cmd(act.setForegroundColor, this.arrayLabelID[i], '#0000FF');
+			this.cmd(act.setForegroundColor, this.arrayLabelID[i], '#96c736'); // Justus
 		}
 		this.cmd(act.createLabel, this.topLabelID, 'Size', TOP_LABEL_X, TOP_LABEL_Y);
 		this.cmd(
@@ -217,7 +217,7 @@ export default class StackArray extends Algorithm {
 		this.cmd(act.createLabel, labPushValID, elemToPush, PUSH_ELEMENT_X, PUSH_ELEMENT_Y);
 
 		this.cmd(act.step);
-		this.cmd(act.createHighlightCircle, this.highlight1ID, '#0000FF', TOP_POS_X, TOP_POS_Y);
+		this.cmd(act.createHighlightCircle, this.highlight1ID, '#96c736', TOP_POS_X, TOP_POS_Y); // Justus
 		this.cmd(act.step);
 
 		const xpos = (this.top % ARRAY_ELEMS_PER_LINE) * ARRAY_ELEM_WIDTH + ARRAY_START_X;
@@ -271,7 +271,7 @@ export default class StackArray extends Algorithm {
 		this.cmd(act.step);
 		this.cmd(act.setHighlight, this.topID, 0);
 
-		this.cmd(act.createHighlightCircle, this.highlight1ID, '#0000FF', TOP_POS_X, TOP_POS_Y);
+		this.cmd(act.createHighlightCircle, this.highlight1ID, '#96c736', TOP_POS_X, TOP_POS_Y); // Justus
 		this.cmd(act.step);
 
 		const xpos = (this.top % ARRAY_ELEMS_PER_LINE) * ARRAY_ELEM_WIDTH + ARRAY_START_X;
