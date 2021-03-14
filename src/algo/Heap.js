@@ -33,13 +33,13 @@ import Algorithm, {
 } from './Algorithm.js';
 import { act } from '../anim/AnimationMain';
 
-const ARRAY_SIZE = 32;
-const ARRAY_ELEM_WIDTH = 30;
-const ARRAY_ELEM_HEIGHT = 25;
+const ARRAY_SIZE = 17;
+const ARRAY_ELEM_WIDTH = 40;
+const ARRAY_ELEM_HEIGHT = 40;
 const ARRAY_INITIAL_X = 30;
 
-const ARRAY_Y_POS = 50;
-const ARRAY_LABEL_Y_POS = 75;
+const ARRAY_Y_POS = 70;
+const ARRAY_LABEL_Y_POS = 110;
 
 const HEAP_X_POSITIONS = [
 	0,
@@ -76,40 +76,45 @@ const HEAP_X_POSITIONS = [
 	825,
 ];
 
+const HEAP_Y_OFF = 60;
 const HEAP_Y_POSITIONS = [
-	0,
-	110,
-	180,
-	180,
-	250,
-	250,
-	250,
-	250,
-	320,
-	320,
-	320,
-	320,
-	320,
-	320,
-	320,
-	320,
-	390,
-	390,
-	390,
-	390,
-	390,
-	390,
-	390,
-	390,
-	390,
-	390,
-	390,
-	390,
-	390,
-	390,
-	390,
-	390,
+	HEAP_Y_OFF + 0,
+	HEAP_Y_OFF + 110,
+	HEAP_Y_OFF + 180,
+	HEAP_Y_OFF + 180,
+	HEAP_Y_OFF + 250,
+	HEAP_Y_OFF + 250,
+	HEAP_Y_OFF + 250,
+	HEAP_Y_OFF + 250,
+	HEAP_Y_OFF + 320,
+	HEAP_Y_OFF + 320,
+	HEAP_Y_OFF + 320,
+	HEAP_Y_OFF + 320,
+	HEAP_Y_OFF + 320,
+	HEAP_Y_OFF + 320,
+	HEAP_Y_OFF + 320,
+	HEAP_Y_OFF + 320,
+	HEAP_Y_OFF + 390,
+	HEAP_Y_OFF + 390,
+	HEAP_Y_OFF + 390,
+	HEAP_Y_OFF + 390,
+	HEAP_Y_OFF + 390,
+	HEAP_Y_OFF + 390,
+	HEAP_Y_OFF + 390,
+	HEAP_Y_OFF + 390,
+	HEAP_Y_OFF + 390,
+	HEAP_Y_OFF + 390,
+	HEAP_Y_OFF + 390,
+	HEAP_Y_OFF + 390,
+	HEAP_Y_OFF + 390,
+	HEAP_Y_OFF + 390,
+	HEAP_Y_OFF + 390,
+	HEAP_Y_OFF + 390,
 ];
+
+
+const showArray = true; // Justus
+
 
 export default class Heap extends Algorithm {
 	constructor(am) {
@@ -194,6 +199,7 @@ export default class Heap extends Algorithm {
 			this.arrayLabels[i] = this.nextIndex++;
 			this.arrayRects[i] = this.nextIndex++;
 			this.circleObjs[i] = this.nextIndex++;
+			if (showArray && i > 0) {
 			this.cmd(
 				act.createRectangle,
 				this.arrayRects[i],
@@ -206,13 +212,14 @@ export default class Heap extends Algorithm {
 			this.cmd(
 				act.createLabel,
 				this.arrayLabels[i],
-				i,
+				i - 1,
 				this.arrayXPositions[i],
 				ARRAY_LABEL_Y_POS,
 			);
-			this.cmd(act.setForegroundColor, this.arrayLabels[i], '#0000FF');
+			this.cmd(act.setForegroundColor, this.arrayLabels[i], '#668721');
+			}
 		}
-		this.cmd(act.setText, this.arrayRects[0], 'null');
+		// this.cmd(act.setText, this.arrayRects[0], 'null');
 		this.swapLabel1 = this.nextIndex++;
 		this.swapLabel2 = this.nextIndex++;
 		this.swapLabel3 = this.nextIndex++;
@@ -267,7 +274,9 @@ export default class Heap extends Algorithm {
 		this.commands = [];
 		while (this.currentHeapSize > 0) {
 			this.cmd(act.delete, this.circleObjs[this.currentHeapSize]);
+			if (showArray) {
 			this.cmd(act.setText, this.arrayRects[this.currentHeapSize], '');
+			}
 			this.currentHeapSize--;
 		}
 		return this.commands;
@@ -278,10 +287,13 @@ export default class Heap extends Algorithm {
 	}
 
 	swap(index1, index2) {
+	        if (showArray) {
 		this.cmd(act.setText, this.arrayRects[index1], '');
 		this.cmd(act.setText, this.arrayRects[index2], '');
+		}
 		this.cmd(act.setText, this.circleObjs[index1], '');
 		this.cmd(act.setText, this.circleObjs[index2], '');
+		if (showArray) {
 		this.cmd(
 			act.createLabel,
 			this.swapLabel1,
@@ -296,6 +308,7 @@ export default class Heap extends Algorithm {
 			this.arrayXPositions[index2],
 			ARRAY_Y_POS,
 		);
+		}
 		this.cmd(
 			act.createLabel,
 			this.swapLabel3,
@@ -310,27 +323,35 @@ export default class Heap extends Algorithm {
 			HEAP_X_POSITIONS[index2],
 			HEAP_Y_POSITIONS[index2],
 		);
+		if (showArray) {
 		this.cmd(act.move, this.swapLabel1, this.arrayXPositions[index2], ARRAY_Y_POS);
 		this.cmd(act.move, this.swapLabel2, this.arrayXPositions[index1], ARRAY_Y_POS);
+		}
 		this.cmd(act.move, this.swapLabel3, HEAP_X_POSITIONS[index2], HEAP_Y_POSITIONS[index2]);
 		this.cmd(act.move, this.swapLabel4, HEAP_X_POSITIONS[index1], HEAP_Y_POSITIONS[index1]);
 		const tmp = this.arrayData[index1];
 		this.arrayData[index1] = this.arrayData[index2];
 		this.arrayData[index2] = tmp;
 		this.cmd(act.step);
+		if (showArray) {
 		this.cmd(act.setText, this.arrayRects[index1], this.arrayData[index1]);
 		this.cmd(act.setText, this.arrayRects[index2], this.arrayData[index2]);
+		}
 		this.cmd(act.setText, this.circleObjs[index1], this.arrayData[index1]);
 		this.cmd(act.setText, this.circleObjs[index2], this.arrayData[index2]);
+		if (showArray) {
 		this.cmd(act.delete, this.swapLabel1);
 		this.cmd(act.delete, this.swapLabel2);
+		}
 		this.cmd(act.delete, this.swapLabel3);
 		this.cmd(act.delete, this.swapLabel4);
 	}
 
 	setIndexHighlight(index, highlightVal) {
 		this.cmd(act.setHighlight, this.circleObjs[index], highlightVal);
+		if (showArray) {
 		this.cmd(act.setHighlight, this.arrayRects[index], highlightVal);
+		}
 	}
 
 	pushDown(index) {
@@ -400,7 +421,7 @@ export default class Heap extends Algorithm {
 			return this.commands;
 		}
 
-		this.cmd(act.setText, this.descriptLabel1, 'Removing element:');
+		this.cmd(act.setText, this.descriptLabel1, 'Removing Element:');
 		this.cmd(
 			act.createLabel,
 			this.descriptLabel2,
@@ -410,20 +431,24 @@ export default class Heap extends Algorithm {
 			0,
 		);
 		this.cmd(act.setText, this.circleObjs[1], '');
-		this.cmd(act.move, this.descriptLabel2, 120, 40);
+		this.cmd(act.move, this.descriptLabel2, 300, 40);
 		this.cmd(act.step);
 		this.cmd(act.delete, this.descriptLabel2);
-		this.cmd(act.setText, this.descriptLabel1, 'Removing element: ' + this.arrayData[1]);
+		this.cmd(act.setText, this.descriptLabel1, 'Removing Element: ' + this.arrayData[1]);
 		this.arrayData[1] = '';
 		if (this.currentHeapSize > 1) {
+		        if (showArray) {
 			this.cmd(act.setText, this.arrayRects[1], '');
 			this.cmd(act.setText, this.arrayRects[this.currentHeapSize], '');
+			}
 			this.swap(1, this.currentHeapSize);
 			this.cmd(act.delete, this.circleObjs[this.currentHeapSize]);
 			this.currentHeapSize--;
 			this.pushDown(1);
 		} else {
+		        if (showArray) {
 			this.cmd(act.setText, this.arrayRects[1], '');
+			}
 			this.cmd(act.delete, this.circleObjs[this.currentHeapSize]);
 			this.currentHeapSize--;
 		}
@@ -447,7 +472,9 @@ export default class Heap extends Algorithm {
 				HEAP_X_POSITIONS[i],
 				HEAP_Y_POSITIONS[i],
 			);
+			if (showArray) {
 			this.cmd(act.setText, this.arrayRects[i], this.arrayData[i]);
+			}
 			if (i > 1) {
 				this.cmd(act.connect, this.circleObjs[Math.floor(i / 2)], this.circleObjs[i]);
 			}
@@ -482,7 +509,7 @@ export default class Heap extends Algorithm {
 			HEAP_X_POSITIONS[this.currentHeapSize],
 			HEAP_Y_POSITIONS[this.currentHeapSize],
 		);
-		this.cmd(act.createLabel, this.descriptLabel2, insertedValue, 120, 45, 1);
+		this.cmd(act.createLabel, this.descriptLabel2, insertedValue, 300, 45, 1);
 		if (this.currentHeapSize > 1) {
 			this.cmd(
 				act.connect,
@@ -500,7 +527,9 @@ export default class Heap extends Algorithm {
 		this.cmd(act.step);
 		this.cmd(act.setText, this.circleObjs[this.currentHeapSize], insertedValue);
 		this.cmd(act.delete, this.descriptLabel2);
+		if (showArray) {
 		this.cmd(act.setText, this.arrayRects[this.currentHeapSize], insertedValue);
+		}
 
 		let currentIndex = this.currentHeapSize;
 		let parentIndex = Math.floor(currentIndex / 2);

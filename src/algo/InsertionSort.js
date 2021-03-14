@@ -158,7 +158,7 @@ export default class InsertionSort extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			this.iPointerID,
-			'#0000FF',
+			'#002459',
 			ARRAY_START_X,
 			ARRAY_START_Y,
 		);
@@ -166,7 +166,7 @@ export default class InsertionSort extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			this.jPointerID,
-			'#0000FF',
+			'#002459',
 			ARRAY_START_X + ARRAY_ELEM_WIDTH,
 			ARRAY_START_Y,
 		);
@@ -182,8 +182,8 @@ export default class InsertionSort extends Algorithm {
 					break;
 				}
 			}
-			if (i === 1) this.cmd(act.setBackgroundColor, this.arrayID[0], '#2ECC71');
-			this.cmd(act.setBackgroundColor, this.arrayID[i], '#2ECC71');
+			if (i === 1) this.cmd(act.setBackgroundColor, this.arrayID[0], '#D1FF8E');
+			this.cmd(act.setBackgroundColor, this.arrayID[i], '#D1FF8E');
 			this.cmd(act.step);
 		}
 
@@ -205,8 +205,8 @@ export default class InsertionSort extends Algorithm {
 	}
 
 	swap(i, j) {
-		this.cmd(act.setForegroundColor, this.iPointerID, '#FF0000');
-		this.cmd(act.setForegroundColor, this.jPointerID, '#FF0000');
+		this.cmd(act.setForegroundColor, this.iPointerID, '#FF8000');
+		this.cmd(act.setForegroundColor, this.jPointerID, '#FF8000');
 		const iLabelID = this.nextIndex++;
 		const iXPos = i * ARRAY_ELEM_WIDTH + ARRAY_START_X;
 		const iYPos = ARRAY_START_Y;
@@ -235,8 +235,8 @@ export default class InsertionSort extends Algorithm {
 		this.displayData[i] = this.displayData[j];
 		this.displayData[j] = temp;
 
-		this.cmd(act.setForegroundColor, this.iPointerID, '#0000FF');
-		this.cmd(act.setForegroundColor, this.jPointerID, '#0000FF');
+		this.cmd(act.setForegroundColor, this.iPointerID, '#002459');
+		this.cmd(act.setForegroundColor, this.jPointerID, '#002459');
 		this.cmd(act.step);
 	}
 

@@ -209,7 +209,7 @@ export default class SelectionSort extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			this.iPointerID,
-			'#FF0000',
+			'#FF8000',
 			ARRAY_START_X + circleShift,
 			ARRAY_START_Y,
 		);
@@ -223,7 +223,7 @@ export default class SelectionSort extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			this.jPointerID,
-			'#0000FF',
+			'#002459',
 			ARRAY_START_X + circleShift,
 			ARRAY_START_Y,
 		);
@@ -237,7 +237,7 @@ export default class SelectionSort extends Algorithm {
 			}
 
 			let toSwap = k;
-			this.cmd(act.setBackgroundColor, this.arrayID[toSwap], '#FFFF00');
+			this.cmd(act.setBackgroundColor, this.arrayID[toSwap], '#ffe6c2');
 
 			for (let j = i + 1; j < this.arrayData.length; j++) {
 				let w = j;
@@ -251,14 +251,14 @@ export default class SelectionSort extends Algorithm {
 					this.cmd(act.step);
 					toSwap = w;
 					this.movePointers(toSwap, w);
-					this.cmd(act.setBackgroundColor, this.arrayID[toSwap], '#FFFF00');
+					this.cmd(act.setBackgroundColor, this.arrayID[toSwap], '#ffe6c2');
 					this.cmd(act.step);
 				}
 			}
 			this.swap(k, toSwap);
 			this.cmd(act.setBackgroundColor, this.arrayID[toSwap], '#FFFFFF');
 			this.cmd(act.step);
-			this.cmd(act.setBackgroundColor, this.arrayID[k], '#2ECC71');
+			this.cmd(act.setBackgroundColor, this.arrayID[k], '#D1FF8E');
 			this.cmd(act.step);
 		}
 
@@ -270,7 +270,7 @@ export default class SelectionSort extends Algorithm {
 		if (!this.isMin) {
 			lastIndex = 0;
 		}
-		this.cmd(act.setBackgroundColor, this.arrayID[lastIndex], '#2ECC71');
+		this.cmd(act.setBackgroundColor, this.arrayID[lastIndex], '#D1FF8E');
 
 		return this.commands;
 	}

@@ -86,7 +86,7 @@ export default class AnimatedCircle extends AnimatedObject {
 		context.stroke();
 
 		context.textAlign = 'center';
-		context.font = '12px Arial';
+		context.font = '24px Arial';
 		context.textBaseline = 'middle';
 		context.lineWidth = 2;
 		context.fillStyle = this.foregroundColor;
