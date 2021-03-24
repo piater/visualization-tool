@@ -28,12 +28,12 @@ import { addDivisorToAlgorithmBar, addRadioButtonGroupToAlgorithmBar } from './A
 import Hash from './Hash.js';
 import { act } from '../anim/AnimationMain';
 
-const ARRAY_ELEM_WIDTH = 60;
-const ARRAY_ELEM_HEIGHT = 30;
-const ARRAY_ELEM_START_Y = 110;
-const ARRAY_VERTICAL_SEPARATION = 70;
+const ARRAY_ELEM_WIDTH = 90;	// Justus: 90; for abcdefghi: 130
+const ARRAY_ELEM_HEIGHT = 40;
+const ARRAY_ELEM_START_Y = 200;
+const ARRAY_VERTICAL_SEPARATION = 100;
 
-const CLOSED_HASH_TABLE_SIZE = 13;
+const CLOSED_HASH_TABLE_SIZE = 7; // Justus
 
 const ARRAY_ELEM_START_X = 100;
 // If you want to center the array:
@@ -54,7 +54,7 @@ const DEFAULT_LOAD_FACTOR = 0.67;
 
 const MAX_SIZE = 70;
 
-const INDEX_COLOR = '#0000FF';
+const INDEX_COLOR = '#668721';
 
 export default class ClosedHash extends Hash {
 	constructor(am, w, h) {
@@ -164,7 +164,7 @@ export default class ClosedHash extends Hash {
 			this.cmd(
 				act.setText,
 				this.ExplainLabel,
-				'Element ' + String(elem) + ' is already in HashMap.',
+				'Element ' + String(elem) + ' existiert bereits.',
 			);
 			return this.commands;
 		}
@@ -295,10 +295,17 @@ export default class ClosedHash extends Hash {
 			} else {
 				this.cmd(act.setText, this.ExplainLabel, 'Inserting at null spot');
 			}
-			this.cmd(act.setHighlight, this.hashTableVisual[index], 1);
+			this.cmd(act.setHighlight, this.hashTableVisual[candidateIndex], 1);
 			this.cmd(act.step);
-			return removedIndex !== -1 ? removedIndex : index;
+			this.cmd(act.setHighlight, this.hashTableVisual[candidateIndex], 0);
 		}
+		if (this.currentHashingTypeButtonState === this.doubleHashingButton) {
+			this.cmd(act.delete, --this.nextIndex);
+		}
+		this.cmd(act.setText, this.ExplainLabel, '');
+		this.cmd(act.setText, this.DelIndexLabel, '');
+		return (foundIndex !== -1) ? -1 :
+			((firstDeletedIndex !== -1) ? firstDeletedIndex : index);
 	}
 
 	getElemIndex(index, elem) {
@@ -350,7 +357,7 @@ export default class ClosedHash extends Hash {
 
 	deleteElement(elem) {
 		this.commands = [];
-		this.cmd(act.setText, this.ExplainLabel, 'Deleting element: ' + elem);
+		this.cmd(act.setText, this.ExplainLabel, 'Entferne Element: ' + elem);
 		let index = this.doHash(elem);
 
 		index = this.getElemIndex(index, elem);
@@ -359,7 +366,7 @@ export default class ClosedHash extends Hash {
 			this.cmd(
 				act.setText,
 				this.ExplainLabel,
-				'Deleting element: ' + elem + '  Element deleted',
+				'Entferne Element: ' + elem + '  Element entfernt',
 			);
 			// this.empty[index] = true;
 			this.deleted[index] = true;
@@ -369,7 +376,7 @@ export default class ClosedHash extends Hash {
 			this.cmd(
 				act.setText,
 				this.ExplainLabel,
-				'Deleting element: ' + elem + '  Element not in table',
+				'Entferne Element: ' + elem + '  Element existiert nicht',
 			);
 		}
 		return this.commands;
@@ -378,14 +385,14 @@ export default class ClosedHash extends Hash {
 	findElement(elem) {
 		this.commands = [];
 
-		this.cmd(act.setText, this.ExplainLabel, 'Finding Element: ' + elem);
+		this.cmd(act.setText, this.ExplainLabel, 'Suche Element: ' + elem);
 		const index = this.doHash(elem);
 
 		const found = this.getElemIndex(index, elem) !== -1;
 		if (found) {
-			this.cmd(act.setText, this.ExplainLabel, 'Finding Element: ' + elem + '  Found!');
+			this.cmd(act.setText, this.ExplainLabel, 'Suche Element: ' + elem + '  gefunden!');
 		} else {
-			this.cmd(act.setText, this.ExplainLabel, 'Finding Element: ' + elem + '  Not Found!');
+			this.cmd(act.setText, this.ExplainLabel, 'Suche Element: ' + elem + '  nicht gefunden!');
 		}
 		return this.commands;
 	}

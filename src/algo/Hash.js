@@ -24,6 +24,12 @@
 // authors and should not be interpreted as representing official policies, either expressed
 // or implied, of the University of San Francisco
 
+/* Hash Code h (32 bit) for strings k of length K:
+   h = 0;
+   for (i = K - 1; i >= 0; i--)
+     h = ((h << 4) ^ ((h & 0xf0000000) >> 6)) + k[i];
+ */
+
 import Algorithm, {
 	addControlToAlgorithmBar,
 	addDivisorToAlgorithmBar,
@@ -34,22 +40,22 @@ import { act } from '../anim/AnimationMain';
 const MAX_HASH_LENGTH = 10;
 const MAX_LOAD_LENGTH = 2;
 
-const HASH_NUMBER_START_X = 200;
-const HASH_X_DIFF = 7;
+const HASH_NUMBER_START_X = 300;
+const HASH_X_DIFF = 14;
 const HASH_NUMBER_START_Y = 10;
-const HASH_ADD_START_Y = 30;
-const HASH_INPUT_START_X = 60;
-const HASH_INPUT_X_DIFF = 7;
-const HASH_INPUT_START_Y = 45;
-const HASH_ADD_LINE_Y = 42;
-const HASH_RESULT_Y = 50;
+const HASH_ADD_START_Y = 40;
+const HASH_INPUT_START_X = 120;
+const HASH_INPUT_X_DIFF = 14;
+const HASH_INPUT_START_Y = 40;
+const HASH_ADD_LINE_Y = 65;
+const HASH_RESULT_Y = 70;
 const ELF_HASH_SHIFT = 10;
 
 const HASH_LABEL_X = 200;
 const HASH_LABEL_Y = 45;
 const HASH_LABEL_DELTA_X = 50;
 
-const HIGHLIGHT_COLOR = '#0000FF';
+const HIGHLIGHT_COLOR = '#002459';
 
 export default class Hash extends Algorithm {
 	constructor(am, w, h) {
@@ -236,7 +242,7 @@ export default class Hash extends Algorithm {
 			return index;
 		} else {
 			const label1 = this.nextIndex++;
-			this.cmd(act.createLabel, label1, 'Hashing:', 10, 45, 0);
+			this.cmd(act.createLabel, label1, 'Hashing:', 10, HASH_ADD_START_Y, 0);
 			const wordToHashID = new Array(input.length);
 			const wordToHash = new Array(input.length);
 			for (let i = 0; i < input.length; i++) {
@@ -502,8 +508,8 @@ export default class Hash extends Algorithm {
 				act.createLabel,
 				label2,
 				index,
-				HASH_NUMBER_START_X + 32 * HASH_X_DIFF + 105,
-				HASH_NUMBER_START_Y,
+				HASH_NUMBER_START_X + 32 * HASH_X_DIFF,
+				HASH_NUMBER_START_Y + 30,
 				0,
 			);
 			this.cmd(act.step);
@@ -512,8 +518,8 @@ export default class Hash extends Algorithm {
 				act.createHighlightCircle,
 				highlightID,
 				HIGHLIGHT_COLOR,
-				HASH_NUMBER_START_X + 30 * HASH_X_DIFF + 120,
-				HASH_NUMBER_START_Y + 15,
+				HASH_NUMBER_START_X + 32 * HASH_X_DIFF,
+				HASH_NUMBER_START_Y + 45,
 			);
 			this.cmd(act.move, highlightID, this.indexXPos[index], this.indexYPos[index]);
 			this.cmd(act.step);
