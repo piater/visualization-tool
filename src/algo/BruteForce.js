@@ -176,7 +176,7 @@ export default class BruteForce extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			iPointerID,
-			'#0000FF',
+			'#002459',
 			ARRAY_START_X,
 			ARRAY_START_Y,
 			this.cellSize / 2,
@@ -184,7 +184,7 @@ export default class BruteForce extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			jPointerID,
-			'#0000FF',
+			'#002459',
 			ARRAY_START_X,
 			ARRAY_START_Y + this.cellSize,
 			this.cellSize / 2,
@@ -205,7 +205,7 @@ export default class BruteForce extends Algorithm {
 			}
 			this.cmd(act.step);
 			while (j < pattern.length && pattern.charAt(j) === text.charAt(i + j)) {
-				this.cmd(act.setBackgroundColor, this.comparisonMatrixID[row][i + j], '#2ECC71');
+				this.cmd(act.setBackgroundColor, this.comparisonMatrixID[row][i + j], '#D1FF8E');
 				j++;
 				this.cmd(act.step);
 				if (j !== pattern.length) {
@@ -217,7 +217,7 @@ export default class BruteForce extends Algorithm {
 				}
 			}
 			if (j !== pattern.length) {
-				this.cmd(act.setBackgroundColor, this.comparisonMatrixID[row][i + j], '#E74C3C');
+				this.cmd(act.setBackgroundColor, this.comparisonMatrixID[row][i + j], '#ffe6c2');
 			}
 			i++;
 			j = 0;

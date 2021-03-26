@@ -205,7 +205,7 @@ export default class KMP extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			iPointerID,
-			'#0000FF',
+			'#002459',
 			ARRAY_START_X,
 			ARRAY_START_Y,
 			this.cellSize / 2,
@@ -213,7 +213,7 @@ export default class KMP extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			jPointerID,
-			'#0000FF',
+			'#002459',
 			ARRAY_START_X,
 			ARRAY_START_Y + this.cellSize,
 			this.cellSize / 2,
@@ -259,7 +259,7 @@ export default class KMP extends Algorithm {
 					ypos,
 				);
 				if (k - i < j) {
-					this.cmd(act.setBackgroundColor, this.comparisonMatrixID[row][k], '#FFFF4D');
+					this.cmd(act.setBackgroundColor, this.comparisonMatrixID[row][k], '#E3F0FF');
 				}
 			}
 			this.cmd(act.step);
@@ -267,7 +267,7 @@ export default class KMP extends Algorithm {
 			this.cmd(act.setAlpha, f0PointerID, 0);
 			this.cmd(act.setAlpha, f1PointerID, 0);
 			while (j < pattern.length && pattern.charAt(j) === text.charAt(i + j)) {
-				this.cmd(act.setBackgroundColor, this.comparisonMatrixID[row][i + j], '#2ECC71');
+				this.cmd(act.setBackgroundColor, this.comparisonMatrixID[row][i + j], '#D1FF8E');
 				j++;
 				this.cmd(act.step);
 				if (j < pattern.length) {
@@ -279,14 +279,14 @@ export default class KMP extends Algorithm {
 				}
 			}
 			if (j === 0) {
-				this.cmd(act.setBackgroundColor, this.comparisonMatrixID[row][i], '#E74C3C');
+				this.cmd(act.setBackgroundColor, this.comparisonMatrixID[row][i], '#ffe6c2');
 				i++;
 			} else {
 				if (j !== pattern.length) {
 					this.cmd(
 						act.setBackgroundColor,
 						this.comparisonMatrixID[row][i + j],
-						'#E74C3C',
+						'#ffe6c2',
 					);
 				}
 				const nextAlignment = failureTable[j - 1];
@@ -425,7 +425,7 @@ export default class KMP extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			iPointerID,
-			'#0000FF',
+			'#002459',
 			tableStartX,
 			FAILURE_TABLE_START_Y,
 			this.cellSize / 2,
@@ -433,7 +433,7 @@ export default class KMP extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			jPointerID,
-			'#FF0000',
+			'#FF8000',
 			tableStartX + this.cellSize,
 			FAILURE_TABLE_START_Y,
 			this.cellSize / 2,
