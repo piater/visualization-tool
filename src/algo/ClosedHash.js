@@ -295,17 +295,10 @@ export default class ClosedHash extends Hash {
 			} else {
 				this.cmd(act.setText, this.ExplainLabel, 'Inserting at null spot');
 			}
-			this.cmd(act.setHighlight, this.hashTableVisual[candidateIndex], 1);
+			this.cmd(act.setHighlight, this.hashTableVisual[index], 1);
 			this.cmd(act.step);
-			this.cmd(act.setHighlight, this.hashTableVisual[candidateIndex], 0);
+			return removedIndex !== -1 ? removedIndex : index;
 		}
-		if (this.currentHashingTypeButtonState === this.doubleHashingButton) {
-			this.cmd(act.delete, --this.nextIndex);
-		}
-		this.cmd(act.setText, this.ExplainLabel, '');
-		this.cmd(act.setText, this.DelIndexLabel, '');
-		return (foundIndex !== -1) ? -1 :
-			((firstDeletedIndex !== -1) ? firstDeletedIndex : index);
 	}
 
 	getElemIndex(index, elem) {
