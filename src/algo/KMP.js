@@ -32,11 +32,11 @@ import Algorithm, {
 import { act } from '../anim/AnimationMain';
 
 const ARRAY_START_X = 100;
-const ARRAY_START_Y = 30;
+const ARRAY_START_Y = 120;	// Justus: 30
 
 const MAX_LENGTH = 22;
 
-const FAILURE_TABLE_START_Y = 100;
+const FAILURE_TABLE_START_Y = 30; // Justus: 100
 
 export default class KMP extends Algorithm {
 	constructor(am, w, h) {
@@ -195,7 +195,7 @@ export default class KMP extends Algorithm {
 		}
 
 		const failureTable = this.buildFailureTable(text.length, pattern);
-		const tableStartX = ARRAY_START_X + text.length * this.cellSize + 110;
+		const tableStartX = ARRAY_START_X + 190;
 
 		const iPointerID = this.nextIndex++;
 		const jPointerID = this.nextIndex++;
@@ -221,7 +221,7 @@ export default class KMP extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			fjPointerID,
-			'#FF0000',
+			'#FF8000',
 			ARRAY_START_X,
 			ARRAY_START_Y + this.cellSize,
 			this.cellSize / 2,
@@ -229,7 +229,7 @@ export default class KMP extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			f0PointerID,
-			'#FF0000',
+			'#FF8000',
 			tableStartX,
 			FAILURE_TABLE_START_Y,
 			this.cellSize / 2,
@@ -237,7 +237,7 @@ export default class KMP extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			f1PointerID,
-			'#FF0000',
+			'#FF8000',
 			tableStartX,
 			FAILURE_TABLE_START_Y + this.cellSize,
 			this.cellSize / 2,
@@ -379,18 +379,18 @@ export default class KMP extends Algorithm {
 
 	buildFailureTable(textLength, pattern) {
 		// Display label
-		const labelX = ARRAY_START_X + textLength * this.cellSize + 10;
+		const labelX = ARRAY_START_X + 10;
 		this.cmd(
 			act.createLabel,
 			this.failureTableLabelID,
 			'Failure table:',
 			labelX,
-			FAILURE_TABLE_START_Y + 10,
+			FAILURE_TABLE_START_Y + 5,
 			0,
 		);
 
 		// Display empty failure table
-		const tableStartX = ARRAY_START_X + textLength * this.cellSize + 110;
+		const tableStartX = ARRAY_START_X + 190;
 		this.failureTableCharacterID = new Array(pattern.length);
 		this.failureTableValueID = new Array(pattern.length);
 		for (let i = 0; i < pattern.length; i++) {
