@@ -32,8 +32,8 @@ import Algorithm, {
 } from './Algorithm.js';
 import { act } from '../anim/AnimationMain';
 
-const ARRAY_START_X = 100;
-const ARRAY_START_Y = 200;
+const ARRAY_START_X = 50;
+const ARRAY_START_Y = 50;
 const ARRAY_ELEM_WIDTH = 50;
 const ARRAY_ELEM_HEIGHT = 50;
 
@@ -198,12 +198,12 @@ export default class QuickSort extends Algorithm {
 
 		// Hightlight cells in the current sub-array
 		for (let i = left; i <= right; i++) {
-			this.cmd(act.setBackgroundColor, this.arrayID[i], '#99CCFF');
+			this.cmd(act.setBackgroundColor, this.arrayID[i], '#E3F0FF');
 		}
 		this.cmd(act.step);
 
 		if (left === right) {
-			this.cmd(act.setBackgroundColor, this.arrayID[left], '#2ECC71');
+			this.cmd(act.setBackgroundColor, this.arrayID[left], '#D1FF8E');
 			this.cmd(act.step);
 			return;
 		}
@@ -230,7 +230,7 @@ export default class QuickSort extends Algorithm {
 			pivot = Math.floor(Math.random() * (right - left)) + left + 1;
 		}
 		const pXPos = pivot * ARRAY_ELEM_WIDTH + ARRAY_START_X;
-		this.cmd(act.createHighlightCircle, this.pPointerID, '#FFFF00', pXPos, ARRAY_START_Y);
+		this.cmd(act.createHighlightCircle, this.pPointerID, '#668721', pXPos, ARRAY_START_Y);
 		this.cmd(act.step);
 		this.swapPivot(pivot, left);
 
@@ -239,8 +239,8 @@ export default class QuickSort extends Algorithm {
 		let j = right;
 		const iXPos = i * ARRAY_ELEM_WIDTH + ARRAY_START_X;
 		const jXPos = j * ARRAY_ELEM_WIDTH + ARRAY_START_X;
-		this.cmd(act.createHighlightCircle, this.iPointerID, '#0000FF', iXPos, ARRAY_START_Y);
-		this.cmd(act.createHighlightCircle, this.jPointerID, '#0000FF', jXPos, ARRAY_START_Y);
+		this.cmd(act.createHighlightCircle, this.iPointerID, '#002459', iXPos, ARRAY_START_Y);
+		this.cmd(act.createHighlightCircle, this.jPointerID, '#002459', jXPos, ARRAY_START_Y);
 		this.cmd(act.step);
 		while (i <= j) {
 			while (i <= j && this.arrayData[left] >= this.arrayData[i]) {
@@ -248,7 +248,7 @@ export default class QuickSort extends Algorithm {
 				this.movePointers(i, j);
 			}
 			if (i <= j) {
-				this.cmd(act.setForegroundColor, this.iPointerID, '#FF0000');
+				this.cmd(act.setForegroundColor, this.iPointerID, '#FF8000');
 				this.cmd(act.step);
 			}
 			while (i <= j && this.arrayData[left] <= this.arrayData[j]) {
@@ -256,7 +256,7 @@ export default class QuickSort extends Algorithm {
 				this.movePointers(i, j);
 			}
 			if (i <= j) {
-				this.cmd(act.setForegroundColor, this.jPointerID, '#FF0000');
+				this.cmd(act.setForegroundColor, this.jPointerID, '#FF8000');
 				this.cmd(act.step);
 			}
 			if (i <= j) {
@@ -280,7 +280,7 @@ export default class QuickSort extends Algorithm {
 		for (let i = left; i <= right; i++) {
 			this.cmd(act.setBackgroundColor, this.arrayID[i], '#FFFFFF');
 		}
-		this.cmd(act.setBackgroundColor, this.arrayID[j], '#2ECC71');
+		this.cmd(act.setBackgroundColor, this.arrayID[j], '#D1FF8E');
 		this.cmd(act.step);
 
 		this.helper(left, j - 1);
@@ -292,19 +292,19 @@ export default class QuickSort extends Algorithm {
 
 		// Hightlight cells in the current sub-array
 		for (let i = left; i <= right; i++) {
-			this.cmd(act.setBackgroundColor, this.arrayID[i], '#99CCFF');
+			this.cmd(act.setBackgroundColor, this.arrayID[i], '#E3F0FF');
 		}
 		this.cmd(act.step);
 
 		if (left === right) {
-			this.cmd(act.setBackgroundColor, this.arrayID[left], '#2ECC71');
+			this.cmd(act.setBackgroundColor, this.arrayID[left], '#D1FF8E');
 			this.cmd(act.step);
 			return;
 		}
 
 		let pivot = right;
 		const pXPos = pivot * ARRAY_ELEM_WIDTH + ARRAY_START_X;
-		this.cmd(act.createHighlightCircle, this.pPointerID, '#FFFF00', pXPos, ARRAY_START_Y);
+		this.cmd(act.createHighlightCircle, this.pPointerID, '#668721', pXPos, ARRAY_START_Y);
 		this.cmd(act.step);
 
 		// Partition
@@ -312,15 +312,15 @@ export default class QuickSort extends Algorithm {
 		let j = left;
 		const iXPos = i * ARRAY_ELEM_WIDTH + ARRAY_START_X;
 		const jXPos = j * ARRAY_ELEM_WIDTH + ARRAY_START_X;
-		this.cmd(act.createHighlightCircle, this.iPointerID, '#0000FF', iXPos, ARRAY_START_Y);
-		this.cmd(act.createHighlightCircle, this.jPointerID, '#0000FF', jXPos, ARRAY_START_Y);
+		this.cmd(act.createHighlightCircle, this.iPointerID, '#002459', iXPos, ARRAY_START_Y);
+		this.cmd(act.createHighlightCircle, this.jPointerID, '#002459', jXPos, ARRAY_START_Y);
 		this.cmd(act.step);
 		while (j <= right) {
 			if (this.arrayData[j] < this.arrayData[pivot]) {
-				this.cmd(act.setForegroundColor, this.jPointerID, '#FF0000');
+				this.cmd(act.setForegroundColor, this.jPointerID, '#FF8000');
 				this.cmd(act.step);
 				this.swap(i, j);
-				this.cmd(act.setForegroundColor, this.jPointerID, '#0000FF');
+				this.cmd(act.setForegroundColor, this.jPointerID, '#002459');
 				i++;
 				this.movePointers(i, j);
 			}
@@ -341,7 +341,7 @@ export default class QuickSort extends Algorithm {
 		for (let j = left; j <= right; j++) {
 			this.cmd(act.setBackgroundColor, this.arrayID[j], '#FFFFFF');
 		}
-		this.cmd(act.setBackgroundColor, this.arrayID[i], '#2ECC71');
+		this.cmd(act.setBackgroundColor, this.arrayID[i], '#D1FF8E');
 		this.cmd(act.step);
 
 		this.helperLomuto(left, i - 1);
@@ -416,8 +416,8 @@ export default class QuickSort extends Algorithm {
 		this.displayData[i] = this.displayData[j];
 		this.displayData[j] = temp;
 		// Reset pointer colors back to blue
-		this.cmd(act.setForegroundColor, this.iPointerID, '#0000FF');
-		this.cmd(act.setForegroundColor, this.jPointerID, '#0000FF');
+		this.cmd(act.setForegroundColor, this.iPointerID, '#002459');
+		this.cmd(act.setForegroundColor, this.jPointerID, '#002459');
 		this.cmd(act.step);
 	}
 

@@ -192,7 +192,7 @@ export default class MergeSort extends Algorithm {
 				this.arrayID,
 			);
 		} else {
-			this.cmd(act.setBackgroundColor, this.arrayID[0], '#2ECC71');
+			this.cmd(act.setBackgroundColor, this.arrayID[0], '#D1FF8E');
 			this.cmd(act.step);
 		}
 
@@ -211,7 +211,7 @@ export default class MergeSort extends Algorithm {
 			this.leftHelper(mid, right, offset, offset, row + 1);
 			this.merge(left, right, mid, row, offset, offset - extraOffset, offset, tempArrayID);
 		} else {
-			this.cmd(act.setBackgroundColor, tempArrayID[left], '#2ECC71');
+			this.cmd(act.setBackgroundColor, tempArrayID[left], '#D1FF8E');
 			this.cmd(act.step);
 		}
 	}
@@ -228,7 +228,7 @@ export default class MergeSort extends Algorithm {
 			this.rightHelper(mid, right, offset + extraOffset, offset, row + 1);
 			this.merge(left, right, mid, row, offset, offset, offset + extraOffset, tempArrayID);
 		} else {
-			this.cmd(act.setBackgroundColor, tempArrayID[left], '#2ECC71');
+			this.cmd(act.setBackgroundColor, tempArrayID[left], '#D1FF8E');
 			this.cmd(act.step);
 		}
 	}
@@ -286,14 +286,14 @@ export default class MergeSort extends Algorithm {
 		const bottomYPos = ARRAY_START_Y + (row + 1) * ARRAY_LINE_SPACING;
 		const iPointerID = this.nextIndex++;
 		const iXPos = left * ARRAY_ELEM_WIDTH + ARRAY_START_X + leftOffset;
-		this.cmd(act.createHighlightCircle, iPointerID, '#0000FF', iXPos, bottomYPos);
+		this.cmd(act.createHighlightCircle, iPointerID, '#002459', iXPos, bottomYPos);
 		const jPointerID = this.nextIndex++;
 		const jXPos = mid * ARRAY_ELEM_WIDTH + ARRAY_START_X + rightOffset;
-		this.cmd(act.createHighlightCircle, jPointerID, '#0000FF', jXPos, bottomYPos);
+		this.cmd(act.createHighlightCircle, jPointerID, '#002459', jXPos, bottomYPos);
 		const kPointerID = this.nextIndex++;
 		const kXPos = left * ARRAY_ELEM_WIDTH + ARRAY_START_X + currOffset;
 		const topYPos = ARRAY_START_Y + row * ARRAY_LINE_SPACING;
-		this.cmd(act.createHighlightCircle, kPointerID, '#0000FF', kXPos, topYPos);
+		this.cmd(act.createHighlightCircle, kPointerID, '#002459', kXPos, topYPos);
 		this.cmd(act.step);
 
 		// Merge data and animate
@@ -396,7 +396,7 @@ export default class MergeSort extends Algorithm {
 
 	copyData(fromIndex, toIndex, fromOffset, toOffset, fromRow, toRow, value, cellID, pointerID) {
 		if (pointerID !== -1) {
-			this.cmd(act.setForegroundColor, pointerID, '#FF0000');
+			this.cmd(act.setForegroundColor, pointerID, '#FF8000');
 			this.cmd(act.step);
 		}
 		const fromXPos = fromIndex * ARRAY_ELEM_WIDTH + ARRAY_START_X + fromOffset;
@@ -410,8 +410,8 @@ export default class MergeSort extends Algorithm {
 		this.cmd(act.setText, cellID, value);
 		this.cmd(act.delete, labelID);
 		if (pointerID !== -1) {
-			this.cmd(act.setBackgroundColor, cellID, '#2ECC71');
-			this.cmd(act.setForegroundColor, pointerID, '#0000FF');
+			this.cmd(act.setBackgroundColor, cellID, '#D1FF8E');
+			this.cmd(act.setForegroundColor, pointerID, '#002459');
 			this.cmd(act.step);
 		}
 	}
