@@ -428,7 +428,7 @@ export default class AnimationManager extends EventListener {
 
 		this.undoStack.push(this.undoBlock);
 
-		if (true) {	// Justus
+		if (false) {	// Justus
 		  this.objectManager.c2s.width = canvas.width;
 		  this.objectManager.c2s.height = canvas.height;
 		  this.objectManager.c2s.__root.setAttribute("width", canvas.width);
