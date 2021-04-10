@@ -741,6 +741,15 @@ export default class AnimationManager extends EventListener {
 		}
 		this.objectManager.statusReport.setText('Animation Completed');
 		this.objectManager.statusReport.setForegroundColor('#000000');
+		if (false) {	// Justus
+		  this.objectManager.c2s.width = canvas.width;
+		  this.objectManager.c2s.height = canvas.height;
+		  this.objectManager.c2s.__root.setAttribute("width", canvas.width);
+		  this.objectManager.c2s.__root.setAttribute("height", canvas.height);
+		  saveAs(new Blob([this.objectManager.c2s.getSerializedSvg(true)],
+				  {type:"image/svg+xml"}),
+			 "vt-" + Date.now() + ".svg");
+		}
 	}
 
 	animUndoUnavailable() {

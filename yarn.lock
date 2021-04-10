@@ -932,6 +932,11 @@
     "lodash" "^4.17.13"
     "to-fast-properties" "^2.0.0"
 
+"@bokeh/canvas2svg@^1.0.22":
+  "integrity" "sha512-jLA/AmmQEjpCJq5U838exrWR/EtnBqfy5qaG/oKpnGXYKj3VcJIUL0WgYMVMHxRZmEUk1GO7SChaUk0Gz4h/vA=="
+  "resolved" "https://registry.npmjs.org/@bokeh/canvas2svg/-/canvas2svg-1.0.22.tgz"
+  "version" "1.0.22"
+
 "@cnakazawa/watch@^1.0.3":
   "integrity" "sha512-r5160ogAvGyHsal38Kux7YYtodEKOj89RGb28ht1jh3SJb08VwRwAKKJL0bGb04Zd/3r9FL3BFIc3bBidYffCA=="
   "resolved" "https://registry.npmjs.org/@cnakazawa/watch/-/watch-1.0.3.tgz"

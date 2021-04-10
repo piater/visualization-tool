@@ -45,6 +45,7 @@ import AnimatedLine from './AnimatedLine';
 import AnimatedLinkedListNode from './AnimatedLinkedListNode';
 import AnimatedRectangle from './AnimatedRectangle';
 import AnimatedSkipListNode from './AnimatedSkipListNode';
+import C2S from '@bokeh/canvas2svg'; // Justus
 
 export default class ObjectManager {
 	constructor(canvasRef) {
@@ -54,6 +55,7 @@ export default class ObjectManager {
 		this.activeLayers = [];
 		this.activeLayers[0] = true;
 		this.ctx = canvasRef.current.getContext('2d');
+		this.c2s = new C2S(); // Justus; see also c2s
 		this.framenum = 0;
 		this.width = 0;
 		this.height = 0;
@@ -67,6 +69,7 @@ export default class ObjectManager {
 		if (this.framenum > 1000) this.framenum = 0;
 
 		this.ctx.clearRect(0, 0, this.width, this.height); // clear canvas
+		this.c2s.clearRect(0, 0, this.width, this.height); // clear canvas
 		this.statusReport.y = this.height - 15;
 
 		let i;
@@ -79,6 +82,7 @@ export default class ObjectManager {
 				!this.nodes[i].alwaysOnTop
 			) {
 				this.nodes[i].draw(this.ctx);
+				this.nodes[i].draw(this.c2s);
 			}
 		}
 		for (i = 0; i < this.nodes.length; i++) {
@@ -90,6 +94,7 @@ export default class ObjectManager {
 			) {
 				this.nodes[i].pulseHighlight(this.framenum);
 				this.nodes[i].draw(this.ctx);
+				this.nodes[i].draw(this.c2s);
 			}
 		}
 
@@ -101,6 +106,7 @@ export default class ObjectManager {
 				this.nodes[i].addedToScene
 			) {
 				this.nodes[i].draw(this.ctx);
+				this.nodes[i].draw(this.c2s);
 			}
 		}
 
@@ -113,6 +119,7 @@ export default class ObjectManager {
 			) {
 				this.nodes[i].pulseHighlight(this.framenum);
 				this.nodes[i].draw(this.ctx);
+				this.nodes[i].draw(this.c2s);
 			}
 		}
 
@@ -122,11 +129,12 @@ export default class ObjectManager {
 					if (this.edges[i][j].addedToScene) {
 						this.edges[i][j].pulseHighlight(this.framenum);
 						this.edges[i][j].draw(this.ctx);
+						this.edges[i][j].draw(this.c2s);
 					}
 				}
 			}
 		}
-		this.statusReport.draw(this.ctx);
+		this.statusReport.draw(this.ctx); // Justus: omit in c2s
 	}
 
 	update() {}
@@ -466,6 +474,7 @@ export default class ObjectManager {
 	getTextWidth(text) {
 		// TODO:  Need to make fonts more flexible, and less hardwired.
 		this.ctx.font = '12px Arial';
+		this.c2s.font = '12px Arial';
 		const strList = text.split('\n');
 		let width = 0;
 		if (strList.length === 1) {
