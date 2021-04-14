@@ -27,27 +27,30 @@
 import Algorithm, { addControlToAlgorithmBar, addLabelToAlgorithmBar } from './Algorithm.js';
 import { act } from '../anim/AnimationMain';
 
+const SHOW_ALGO = false;	// Justus
+const SHOW_INFO = false;	// Justus
+
 const INFO_MSG_X = 20;
 const INFO_MSG_Y = 10;
 
-const TABLE_ELEM_WIDTH = 40;
+const TABLE_ELEM_WIDTH = 30;
 const TABLE_ELEM_HEIGHT = 30;
 
-const TABLE_START_X = 500;
-const TABLE_START_Y = 80;
+const TABLE_START_X = SHOW_ALGO ? 600 : 100;
+const TABLE_START_Y = 120;
 
 const CODE_START_X = 20;
-const CODE_START_Y = 35;
-const CODE_LINE_HEIGHT = 14;
+const CODE_START_Y = 50;
+const CODE_LINE_HEIGHT = 30;
 
-const CODE_HIGHLIGHT_COLOR = '#FF0000';
+const CODE_HIGHLIGHT_COLOR = '#FF8000';
 const CODE_STANDARD_COLOR = '#000000';
-const LCS_CELL_COLOR = '#99CCFF';
+const LCS_CELL_COLOR = '#E3F0FF';
 const MAX_SEQUENCE_LENGTH = 13;
 
 const SEQUENCE_START_X = 20;
-const SEQUENCE_START_Y = 195;
-const SEQUENCE_DELTA_X = 10;
+const SEQUENCE_START_Y = SHOW_ALGO ? 350 : 400;
+const SEQUENCE_DELTA_X = 20;
 
 export default class LCS extends Algorithm {
 	constructor(am, w, h) {
@@ -86,23 +89,21 @@ export default class LCS extends Algorithm {
 	}
 
 	setup() {
+		if (SHOW_INFO) {
 		this.infoLabelID = this.nextIndex++;
 		this.cmd(act.createLabel, this.infoLabelID, '', INFO_MSG_X, INFO_MSG_Y, 0);
+		}
 
+		if (SHOW_ALGO) {
 		this.code = [
-			['def ', 'LCS(S1, S2, matrix)', ':'],
-			['     for x from 0 to S1.length - 1:'],
-			['          for y from 0 to S2.length - 1:'],
-			['               if ', '(S1[x] == S2[y]):'],
-			['                    matrix[x][y] = 1 + ', 'matrix[x - 1][y-1]'],
-			['               else:'],
-			[
-				'                    matrix[x][y] = max(',
-				'matrix[x - 1][y]',
-				',',
-				' matrix[x][y - 1]',
-				')',
-			],
+			['Algorithm ', 'LCS(X, Y)', ':'],
+			['    for j ← 0 to n - 1 do'],
+			['        for k ← 0 to m - 1 do'],
+			['            if ', 'X[j] = Y[k]', ' then'],
+			['                L[j+1][k+1] = 1 + ', 'L[j][k]'],
+			['            else'],
+			['                L[j+1][k+1] = max{', 'L[j][k+1]', ','],
+			['                                                L[j+1][k]', '}'],
 		];
 
 		this.codeID = Array(this.code.length);
@@ -125,6 +126,7 @@ export default class LCS extends Algorithm {
 				}
 			}
 		}
+		} // SHOW_ALGO
 
 		this.animationManager.startNewAnimation(this.commands);
 		this.animationManager.skipForward();
@@ -170,21 +172,31 @@ export default class LCS extends Algorithm {
 				this.cmd(act.setHighlight, this.tableID[i + 1][j + 1], 1);
 				this.cmd(act.setHighlight, this.S1TableID[i], 1);
 				this.cmd(act.setHighlight, this.S2TableID[j], 1);
+				if (SHOW_ALGO) {
 				this.cmd(act.setForegroundColor, this.codeID[3][1], CODE_HIGHLIGHT_COLOR);
+				}
+				if (SHOW_INFO) {
 				this.cmd(
 					act.setText,
 					this.infoLabelID,
 					'Comparing ' + str1.charAt(i) + ' and ' + str2.charAt(j),
 				);
+				}
 				this.cmd(act.step);
 				this.cmd(act.setHighlight, this.S1TableID[i], 0);
 				this.cmd(act.setHighlight, this.S2TableID[j], 0);
+				if (SHOW_ALGO) {
 				this.cmd(act.setForegroundColor, this.codeID[3][1], CODE_STANDARD_COLOR);
+				}
 				if (str1.charAt(i) === str2.charAt(j)) {
+					if (SHOW_ALGO) {
 					this.cmd(act.setForegroundColor, this.codeID[4][0], CODE_HIGHLIGHT_COLOR);
 					this.cmd(act.setForegroundColor, this.codeID[4][1], CODE_HIGHLIGHT_COLOR);
+					}
 					this.cmd(act.setHighlight, this.tableID[i + 1 - 1][j + 1 - 1], 1);
+					if (SHOW_INFO) {
 					this.cmd(act.setText, this.infoLabelID, 'Match, increment from the diagonal');
+					}
 					this.cmd(act.step);
 					this.cmd(
 						act.createLabel,
@@ -202,33 +214,43 @@ export default class LCS extends Algorithm {
 					);
 					this.cmd(act.step);
 					this.cmd(act.delete, moveID);
+					if (SHOW_ALGO) {
 					this.cmd(act.setForegroundColor, this.codeID[4][0], CODE_STANDARD_COLOR);
 					this.cmd(act.setForegroundColor, this.codeID[4][1], CODE_STANDARD_COLOR);
+					}
 					this.cmd(act.setHighlight, this.tableID[i + 1 - 1][j + 1 - 1], 0);
 					this.tableVals[i + 1][j + 1] = this.tableVals[i][j] + 1;
 					this.cmd(act.setText, this.tableID[i + 1][j + 1], this.tableVals[i + 1][j + 1]);
 				} else {
+					if (SHOW_ALGO) {
 					this.cmd(act.setForegroundColor, this.codeID[6][0], CODE_HIGHLIGHT_COLOR);
 					this.cmd(act.setForegroundColor, this.codeID[6][1], CODE_HIGHLIGHT_COLOR);
 					this.cmd(act.setForegroundColor, this.codeID[6][2], CODE_HIGHLIGHT_COLOR);
 					this.cmd(act.setForegroundColor, this.codeID[6][3], CODE_HIGHLIGHT_COLOR);
 					this.cmd(act.setForegroundColor, this.codeID[6][4], CODE_HIGHLIGHT_COLOR);
+					}
 					this.cmd(act.setHighlight, this.tableID[i][j + 1], 1);
 					this.cmd(act.setHighlight, this.tableID[i + 1][j], 1);
+					if (SHOW_INFO) {
 					this.cmd(
 						act.setText,
 						this.infoLabelID,
 						'Mismatch, copy greatest value from left or above',
 					);
+					}
 					this.cmd(act.step);
 
+					if (SHOW_ALGO) {
 					this.cmd(act.setForegroundColor, this.codeID[6][0], CODE_STANDARD_COLOR);
 					this.cmd(act.setForegroundColor, this.codeID[6][2], CODE_STANDARD_COLOR);
 					this.cmd(act.setForegroundColor, this.codeID[6][4], CODE_STANDARD_COLOR);
+					}
 
 					if (this.tableVals[i][j + 1] > this.tableVals[i + 1][j]) {
 						this.cmd(act.setHighlight, this.tableID[i + 1][j], 0);
+						if (SHOW_ALGO) {
 						this.cmd(act.setForegroundColor, this.codeID[6][3], CODE_STANDARD_COLOR);
+						}
 
 						this.tableVals[i + 1][j + 1] = this.tableVals[i][j + 1];
 						this.cmd(
@@ -239,7 +261,9 @@ export default class LCS extends Algorithm {
 							this.tableYPos[i][j + 1],
 						);
 					} else {
+						if (SHOW_ALGO) {
 						this.cmd(act.setForegroundColor, this.codeID[6][1], CODE_STANDARD_COLOR);
+						}
 						this.cmd(act.setHighlight, this.tableID[i][j + 1], 0);
 						this.tableVals[i + 1][j + 1] = this.tableVals[i + 1][j];
 						this.cmd(
@@ -261,10 +285,14 @@ export default class LCS extends Algorithm {
 					this.cmd(act.setText, this.tableID[i + 1][j + 1], this.tableVals[i + 1][j + 1]);
 					this.cmd(act.delete, moveID);
 					if (this.tableVals[i][j + 1] > this.tableVals[i + 1][j]) {
+						if (SHOW_ALGO) {
 						this.cmd(act.setForegroundColor, this.codeID[6][1], CODE_STANDARD_COLOR);
+						}
 						this.cmd(act.setHighlight, this.tableID[i][j + 1], 0);
 					} else {
+						if (SHOW_ALGO) {
 						this.cmd(act.setForegroundColor, this.codeID[6][3], CODE_STANDARD_COLOR);
+						}
 						this.cmd(act.setHighlight, this.tableID[i + 1][j], 0);
 					}
 				}
@@ -272,12 +300,16 @@ export default class LCS extends Algorithm {
 			}
 		}
 
+		if (SHOW_INFO) {
 		this.cmd(act.setText, this.infoLabelID, 'Finished building table, can now find LCS');
+		}
 		this.cmd(act.step);
 
 		this.buildLCSFromTable(str1, str2);
 
+		if (SHOW_INFO) {
 		this.cmd(act.setText, this.infoLabelID, 'Done');
+		}
 		return this.commands;
 	}
 
@@ -309,11 +341,11 @@ export default class LCS extends Algorithm {
 			this.cmd(
 				act.createLabel,
 				index,
-				i - 1 === -1 ? '\u2205' : i - 1,
+				i,
 				TABLE_START_X + i * TABLE_ELEM_WIDTH,
 				TABLE_START_Y - 1 * TABLE_ELEM_HEIGHT,
 			);
-			this.cmd(act.setForegroundColor, index, '#0000FF');
+			this.cmd(act.setForegroundColor, index, '#668721');
 		}
 
 		this.S2TableID = new Array(y);
@@ -334,11 +366,11 @@ export default class LCS extends Algorithm {
 			this.cmd(
 				act.createLabel,
 				index,
-				i - 1 === -1 ? '\u2205' : i - 1,
+				i,
 				TABLE_START_X - 1 * TABLE_ELEM_WIDTH,
 				TABLE_START_Y + i * TABLE_ELEM_HEIGHT,
 			);
-			this.cmd(act.setForegroundColor, index, '#0000FF');
+			this.cmd(act.setForegroundColor, index, '#668721');
 		}
 
 		for (i = 0; i <= x; i++) {
@@ -387,12 +419,12 @@ export default class LCS extends Algorithm {
 		this.cmd(
 			act.createLabel,
 			header,
-			'Longest Common Subsequence:',
+			'Längste gemeinsame Untersequenz:',
 			SEQUENCE_START_X,
-			SEQUENCE_START_Y - 25,
+			SEQUENCE_START_Y - 40,
 			0,
 		);
-		this.cmd(act.setForegroundColor, header, '#003300');
+		this.cmd(act.setForegroundColor, header, '#668721');
 
 		for (let i = 1; i <= str1.length; i++) {
 			for (let j = 1; j <= str2.length; j++) {
@@ -419,20 +451,24 @@ export default class LCS extends Algorithm {
 			) {
 				this.cmd(act.setHighlight, this.S1TableID[currX - 1], 1);
 				this.cmd(act.setHighlight, this.S2TableID[currY - 1], 1);
+				if (SHOW_INFO) {
 				this.cmd(
 					act.setText,
 					this.infoLabelID,
 					'Hit a corner, move diagonally and add current character to LCS',
 				);
+				}
 				this.cmd(act.step);
 
 				this.cmd(act.setHighlight, this.S1TableID[currX - 1], 0);
 				this.cmd(act.setHighlight, this.S2TableID[currY - 1], 0);
 			} else {
+				if (SHOW_INFO) {
 				if (this.tableVals[currX - 1][currY] > this.tableVals[currX][currY - 1]) {
 					this.cmd(act.setText, this.infoLabelID, 'Move left');
 				} else {
 					this.cmd(act.setText, this.infoLabelID, 'Move up');
+				}
 				}
 				this.cmd(act.step);
 			}
@@ -450,16 +486,16 @@ export default class LCS extends Algorithm {
 					act.createLabel,
 					nextSequenceID,
 					str1.charAt(currX - 1),
-					SEQUENCE_START_X + (sequence.length - 1) * SEQUENCE_DELTA_X + 4,
-					SEQUENCE_START_Y,
+					TABLE_START_X + currX * TABLE_ELEM_WIDTH,
+					TABLE_START_Y + currY * TABLE_ELEM_HEIGHT,
 				);
-				this.cmd(act.setForegroundColor, nextSequenceID, '#0000FF');
+				this.cmd(act.setForegroundColor, nextSequenceID, '#002459');
 
 				for (let i = sequence.length - 1; i >= 0; i--) {
 					this.cmd(
 						act.move,
 						sequence[i],
-						SEQUENCE_START_X + (sequence.length - 1 - i) * SEQUENCE_DELTA_X + 4,
+						SEQUENCE_START_X + (sequence.length - 1 - i) * SEQUENCE_DELTA_X + 8,
 						SEQUENCE_START_Y,
 					);
 				}
