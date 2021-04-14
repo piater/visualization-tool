@@ -472,8 +472,8 @@ export default class ObjectManager {
 
 	getTextWidth(text) {
 		// TODO:  Need to make fonts more flexible, and less hardwired.
-		this.ctx.font = '12px Arial';
-		this.c2s.font = '12px Arial';
+		this.ctx.font = '24px DejaVu Sans';
+		this.c2s.font = '24px DejaVu Sans';
 		const strList = text.split('\n');
 		let width = 0;
 		if (strList.length === 1) {
