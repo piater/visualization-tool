@@ -428,6 +428,10 @@ export default class AnimationManager extends EventListener {
 
 		this.undoStack.push(this.undoBlock);
 
+		this.saveSVG();
+	}
+
+	saveSVG() {
 		if (false) {	// Justus
 		  this.objectManager.c2s.width = canvas.width;
 		  this.objectManager.c2s.height = canvas.height;
@@ -751,6 +755,7 @@ export default class AnimationManager extends EventListener {
 		}
 		this.objectManager.statusReport.setText('Animation Completed');
 		this.objectManager.statusReport.setForegroundColor('#000000');
+		this.saveSVG();
 	}
 
 	animUndoUnavailable() {
