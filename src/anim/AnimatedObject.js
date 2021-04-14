@@ -190,6 +190,7 @@ export default class AnimatedObject {
 			const frameMod = frameNum / 7.0;
 			const delta = Math.abs((frameMod % (2 * this.range - 2)) - this.range + 1);
 			this.highlightDiff = delta + this.minHeightDiff;
+			this.highlightDiff = this.range / 2 + this.minHeightDiff; // Justus: disable
 		}
 	}
 
