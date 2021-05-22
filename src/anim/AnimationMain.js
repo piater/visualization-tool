@@ -1040,6 +1040,7 @@ export const act = {
 		this.undoBlock.push(new UndoCreate(params[0]));
 	},
 	setText(params) {
+		// return;		// Justus
 		// id, text | textIndex
 		params[2] = params[2] || 0;
 		const oldText = this.animatedObjects.getText(params[0], params[2]);
