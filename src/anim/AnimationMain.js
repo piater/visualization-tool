@@ -401,6 +401,7 @@ export default class AnimationManager extends EventListener {
 			this.stopTimer();
 			this.animatedObjects.update();
 			this.animatedObjects.draw();
+			this.saveSVG(); // Justus
 			return;
 		}
 		this.undoAnimationStepIndices.push(this.currentAnimation);
@@ -427,8 +428,6 @@ export default class AnimationManager extends EventListener {
 		}
 
 		this.undoStack.push(this.undoBlock);
-
-		this.saveSVG();
 	}
 
 	saveSVG() {
@@ -494,6 +493,7 @@ export default class AnimationManager extends EventListener {
 
 	// Step forwards one step.  A no-op if the animation is not currently paused
 	step() {
+		this.saveSVG();	// Justus
 		if (this.awaitingStep) {
 			this.startNextBlock();
 			this.fireEvent('AnimationStarted', 'NoData');
@@ -600,6 +600,7 @@ export default class AnimationManager extends EventListener {
 			this.stopTimer();
 			this.animatedObjects.update();
 			this.animatedObjects.draw();
+			this.saveSVG(); // Justus
 		}
 	}
 
@@ -627,7 +628,7 @@ export default class AnimationManager extends EventListener {
 			this.stopTimer();
 			this.animatedObjects.update();
 			this.animatedObjects.draw();
-
+			this.saveSVG(); // Justus
 			return false;
 		}
 		return true;
@@ -755,7 +756,6 @@ export default class AnimationManager extends EventListener {
 		}
 		this.objectManager.statusReport.setText('Animation Completed');
 		this.objectManager.statusReport.setForegroundColor('#000000');
-		this.saveSVG();
 	}
 
 	animUndoUnavailable() {
