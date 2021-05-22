@@ -839,7 +839,7 @@ export const act = {
 		// fromID, toID | color, curve, directed, label, anchorPos, thickness
 		params[2] = params[2] || '#000000';
 		params[3] = params[3] || 0.0;
-		params[4] = params[4] !== false && params[4] !== 0;
+		params[4] = params[4] || false; // !== false && params[4] !== 0;
 		params[5] = params[5] === undefined ? '' : params[5];
 		params[6] = params[6] || 0;
 		params[7] = params[7] === undefined ? 1 : params[7];
