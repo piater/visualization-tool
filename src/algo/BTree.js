@@ -45,13 +45,14 @@ const HEIGHT_DELTA = 50;
 const NODE_SPACING = 3;
 const STARTING_Y = 30;
 const WIDTH_PER_ELEM = 40;
-const NODE_HEIGHT = 20;
+const NODE_HEIGHT = 30;
 
 const MESSAGE_X = 5;
 const MESSAGE_Y = 10;
 
-const FOREGROUND_COLOR = '#007700';
-const BACKGROUND_COLOR = '#EEFFEE';
+const FOREGROUND_COLOR = '#000000';
+const BACKGROUND_COLOR = '#FFFFFF';
+const EDGE_COLOR = '#002459';
 const PRINT_COLOR = FOREGROUND_COLOR;
 
 export default class BTree extends Algorithm {
@@ -415,7 +416,7 @@ export default class BTree extends Algorithm {
 					this.cmd(act.setText, this.messageID, 'Element ' + val + ' is not in the tree');
 				}
 			} else {
-				this.cmd(act.setTextColor, tree.graphicID, '#FF0000', i);
+				this.cmd(act.setTextColor, tree.graphicID, '#FF8000', i);
 				this.cmd(act.setText, this.messageID, 'Element ' + val + ' found');
 				this.cmd(act.step);
 				this.cmd(act.setTextColor, tree.graphicID, FOREGROUND_COLOR, i);
@@ -478,7 +479,7 @@ export default class BTree extends Algorithm {
 			 0, 0, BACKGROUND_COLOR, FOREGROUND_COLOR);
 		node.children[child] = new BTreeNode(treeNodeID, node.x, node.y);
 		this.cmd(act.setLayer, treeNodeID, 1);
-		this.cmd(act.connect, node.graphicID, treeNodeID, FOREGROUND_COLOR,
+		this.cmd(act.connect, node.graphicID, treeNodeID, EDGE_COLOR,
 			 0, 0, '', child);
 		node.children[child].phantomLeaf = true;
 	}
@@ -625,7 +626,7 @@ export default class BTree extends Algorithm {
 					act.connect,
 					currentParent.graphicID,
 					currentParent.children[i].graphicID,
-					FOREGROUND_COLOR,
+					EDGE_COLOR,
 					0, // Curve
 					0, // Directed
 					'', // Label
@@ -652,7 +653,7 @@ export default class BTree extends Algorithm {
 				act.move,
 				this.moveLabel1ID,
 				this.getLabelX(currentParent, parentIndex),
-				currentParent.y,
+				currentParent.y + 2,
 			);
 
 			currentParent.children[parentIndex + 1] = rightNode;
@@ -683,7 +684,7 @@ export default class BTree extends Algorithm {
 					act.connect,
 					rightNode.graphicID,
 					rightNode.children[i - this.split_index - 1].graphicID,
-					FOREGROUND_COLOR,
+					EDGE_COLOR,
 					0, // Curve
 					0, // Directed
 					'', // Label
@@ -716,7 +717,7 @@ export default class BTree extends Algorithm {
 				act.connect,
 				currentParent.graphicID,
 				rightNode.graphicID,
-				FOREGROUND_COLOR,
+				EDGE_COLOR,
 				0, // Curve
 				0, // Directed
 				'', // Label
@@ -750,7 +751,7 @@ export default class BTree extends Algorithm {
 				act.connect,
 				this.treeRoot.graphicID,
 				leftNode.graphicID,
-				FOREGROUND_COLOR,
+				EDGE_COLOR,
 				0, // Curve
 				0, // Directed
 				'', // Label
@@ -760,7 +761,7 @@ export default class BTree extends Algorithm {
 				act.connect,
 				this.treeRoot.graphicID,
 				rightNode.graphicID,
-				FOREGROUND_COLOR,
+				EDGE_COLOR,
 				0, // Curve
 				0, // Directed
 				'', // Label
@@ -1066,7 +1067,7 @@ export default class BTree extends Algorithm {
 					this.cmd(act.setHighlight, tree.graphicID, 0);
 				}
 			} else {
-				this.cmd(act.setTextColor, tree.graphicID, '#FF0000', i);
+				this.cmd(act.setTextColor, tree.graphicID, '#FF8000', i);
 				this.cmd(act.step);
 				if (tree.isLeaf) {
 					this.cmd(act.setTextColor, tree.graphicID, FOREGROUND_COLOR, i);
@@ -1164,7 +1165,7 @@ export default class BTree extends Algorithm {
 					act.connect,
 					tree.graphicID,
 					tree.children[tree.numKeys + 1 + i].graphicID,
-					FOREGROUND_COLOR,
+					EDGE_COLOR,
 					0, // Curve
 					0, // Directed
 					'', // Label
@@ -1180,7 +1181,7 @@ export default class BTree extends Algorithm {
 				act.connect,
 				parentNode.graphicID,
 				parentNode.children[i].graphicID,
-				FOREGROUND_COLOR,
+				EDGE_COLOR,
 				0, // Curve
 				0, // Directed
 				'', // Label
@@ -1265,7 +1266,7 @@ export default class BTree extends Algorithm {
 				act.connect,
 				tree.graphicID,
 				tree.children[tree.numKeys].graphicID,
-				FOREGROUND_COLOR,
+				EDGE_COLOR,
 				0, // Curve
 				0, // Directed
 				'', // Label
@@ -1279,7 +1280,7 @@ export default class BTree extends Algorithm {
 					act.connect,
 					rightSib.graphicID,
 					rightSib.children[i - 1].graphicID,
-					FOREGROUND_COLOR,
+					EDGE_COLOR,
 					0, // Curve
 					0, // Directed
 					'', // Label
@@ -1355,7 +1356,7 @@ export default class BTree extends Algorithm {
 					act.connect,
 					tree.graphicID,
 					tree.children[i].graphicID,
-					FOREGROUND_COLOR,
+					EDGE_COLOR,
 					0, // Curve
 					0, // Directed
 					'', // Label
@@ -1372,7 +1373,7 @@ export default class BTree extends Algorithm {
 				act.connect,
 				tree.graphicID,
 				tree.children[0].graphicID,
-				FOREGROUND_COLOR,
+				EDGE_COLOR,
 				0, // Curve
 				0, // Directed
 				'', // Label

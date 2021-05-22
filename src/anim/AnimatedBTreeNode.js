@@ -102,8 +102,8 @@ export default class AnimatedBTreeNode extends AnimatedObject {
 		const startY = this.top();
 
 		if (this.highlighted) {
-			context.strokeStyle = '#FF0000';
-			context.fillStyle = '#FF0000';
+			context.strokeStyle = '#FF8000';
+			context.fillStyle = '#FF8000';
 
 			context.beginPath();
 			context.moveTo(startX - this.highlightDiff, startY - this.highlightDiff);
@@ -144,7 +144,7 @@ export default class AnimatedBTreeNode extends AnimatedObject {
 				(this.widthPerElement * this.numLabels) / 2 +
 				this.widthPerElement / 2 +
 				i * this.widthPerElement;
-			const labelY = this.y;
+			const labelY = this.y + 2;
 
 			context.fillStyle = this.labelColors[i];
 			context.fillText(this.labels[i], labelX, labelY);
