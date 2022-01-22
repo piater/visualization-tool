@@ -60,7 +60,7 @@ import ReactDOM from 'react-dom';
 import SingleAnimation from './SingleAnimation.js';
 import { Slider } from '@material-ui/core';
 import { UndoConnect } from './AnimatedLine.js';
-import { saveAs } from 'file-saver'; // Justus
+// import { saveAs } from 'file-saver'; // Justus
 
 // Utility function to read a cookie
 function getCookie(cookieName) {
@@ -436,9 +436,9 @@ export default class AnimationManager extends EventListener {
 		  this.objectManager.c2s.height = canvas.height;
 		  this.objectManager.c2s.__root.setAttribute("width", canvas.width);
 		  this.objectManager.c2s.__root.setAttribute("height", canvas.height);
-		  saveAs(new Blob([this.objectManager.c2s.getSerializedSvg(true)],
-				  {type:"image/svg+xml"}),
-			 "vt-" + Date.now() + ".svg");
+		  // saveAs(new Blob([this.objectManager.c2s.getSerializedSvg(true)],
+			// 	  {type:"image/svg+xml"}),
+			//  "vt-" + Date.now() + ".svg");
 		}
 	}
 
@@ -769,11 +769,11 @@ export default class AnimationManager extends EventListener {
 		this.timer = setTimeout(() => this.timeout(), 30);
 		this.update();
 		this.objectManager.draw();
-		if (false) {	// Justus
-		  this.canvas.current.toBlob(function(blob) {
-		      saveAs(blob, "vt-" + Date.now() + ".png");
-		    });
-		}
+		// if (false) {	// Justus
+		//   this.canvas.current.toBlob(function(blob) {
+		//       saveAs(blob, "vt-" + Date.now() + ".png");
+		//     });
+		// }
 	}
 
 	doPlayPause() {
