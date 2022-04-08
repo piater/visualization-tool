@@ -29,7 +29,7 @@ class Header extends React.Component {
 							</Link>
 						</li>
 						<li>
-							<a href="https://github.com/piater/visualization-tool">
+							<a href="https://github.com/piater/visualization-tool/tree/UIBK-branding">
 								Source Code
 							</a>
 						</li>
