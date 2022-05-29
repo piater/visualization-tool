@@ -292,19 +292,19 @@ export default class QuickSort extends Algorithm {
 
 		// Hightlight cells in the current sub-array
 		for (let i = left; i <= right; i++) {
-			this.cmd(act.setBackgroundColor, this.arrayID[i], '#99CCFF');
+			this.cmd(act.setBackgroundColor, this.arrayID[i], '#E3F0FF');
 		}
 		this.cmd(act.step);
 
 		if (left === right) {
-			this.cmd(act.setBackgroundColor, this.arrayID[left], '#2ECC71');
+			this.cmd(act.setBackgroundColor, this.arrayID[left], '#D1FF8E');
 			this.cmd(act.step);
 			return;
 		}
 
 		let pivot = right;
 		const pXPos = pivot * ARRAY_ELEM_WIDTH + ARRAY_START_X;
-		this.cmd(act.createHighlightCircle, this.pPointerID, '#FFFF00', pXPos, ARRAY_START_Y);
+		this.cmd(act.createHighlightCircle, this.pPointerID, '#668721', pXPos, ARRAY_START_Y);
 		this.cmd(act.step);
 
 		// Partition
@@ -312,15 +312,15 @@ export default class QuickSort extends Algorithm {
 		let j = left;
 		const iXPos = i * ARRAY_ELEM_WIDTH + ARRAY_START_X;
 		const jXPos = j * ARRAY_ELEM_WIDTH + ARRAY_START_X;
-		this.cmd(act.createHighlightCircle, this.iPointerID, '#0000FF', iXPos, ARRAY_START_Y);
-		this.cmd(act.createHighlightCircle, this.jPointerID, '#0000FF', jXPos, ARRAY_START_Y);
+		this.cmd(act.createHighlightCircle, this.iPointerID, '#002459', iXPos, ARRAY_START_Y);
+		this.cmd(act.createHighlightCircle, this.jPointerID, '#002459', jXPos, ARRAY_START_Y);
 		this.cmd(act.step);
 		while (j <= right) {
 			if (this.arrayData[j] < this.arrayData[pivot]) {
-				this.cmd(act.setForegroundColor, this.jPointerID, '#FF0000');
+				this.cmd(act.setForegroundColor, this.jPointerID, '#FF8000');
 				this.cmd(act.step);
 				this.swap(i, j);
-				this.cmd(act.setForegroundColor, this.jPointerID, '#0000FF');
+				this.cmd(act.setForegroundColor, this.jPointerID, '#002459');
 				i++;
 				this.movePointers(i, j);
 			}
@@ -341,7 +341,7 @@ export default class QuickSort extends Algorithm {
 		for (let j = left; j <= right; j++) {
 			this.cmd(act.setBackgroundColor, this.arrayID[j], '#FFFFFF');
 		}
-		this.cmd(act.setBackgroundColor, this.arrayID[i], '#2ECC71');
+		this.cmd(act.setBackgroundColor, this.arrayID[i], '#D1FF8E');
 		this.cmd(act.step);
 
 		this.helperLomuto(left, i - 1);
