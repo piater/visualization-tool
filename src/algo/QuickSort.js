@@ -70,6 +70,7 @@ export default class QuickSort extends Algorithm {
 		this.clearButton.onclick = this.clearCallback.bind(this);
 		this.controls.push(this.clearButton);
 
+		/*
 		addDivisorToAlgorithmBar();
 
 		// Toggles
@@ -88,6 +89,7 @@ export default class QuickSort extends Algorithm {
 		this.perfectPivotSelect.onclick = () => (this.pivotType = 'perfect');
 		this.randomPivotSelect.checked = true;
 		this.pivotType = 'random';
+		*/
 
 		addDivisorToAlgorithmBar();
 	}
@@ -193,6 +195,7 @@ export default class QuickSort extends Algorithm {
 		return this.commands;
 	}
 
+  /*
 	helper(left, right) {
 		if (left > right) return;
 
@@ -286,6 +289,7 @@ export default class QuickSort extends Algorithm {
 		this.helper(left, j - 1);
 		this.helper(j + 1, right);
 	}
+  */
 
 	helperLomuto(left, right) {
 		if (left > right) return;
