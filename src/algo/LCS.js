@@ -31,7 +31,7 @@ const SHOW_ALGO = false;	// Justus
 const SHOW_INFO = false;	// Justus
 
 const INFO_MSG_X = 20;
-const INFO_MSG_Y = 10;
+const INFO_MSG_Y = 400;
 
 const TABLE_ELEM_WIDTH = 30;
 const TABLE_ELEM_HEIGHT = 30;
@@ -142,8 +142,12 @@ export default class LCS extends Algorithm {
 	}
 
 	runCallback() {
-		if (this.S1Field.value !== '' && this.S2Field.value !== '') {
-			this.implementAction(this.run.bind(this), this.S1Field.value, this.S2Field.value);
+		const string1 = this.S1Field.value;
+		const string2 = this.S2Field.value;
+		if (string1 !== '' && string2 !== '') {
+			this.S1Field.value = '';
+			this.S2Field.value = '';
+			this.implementAction(this.run.bind(this), string1, string2);
 		}
 	}
 
@@ -173,7 +177,8 @@ export default class LCS extends Algorithm {
 				this.cmd(act.setHighlight, this.S1TableID[i], 1);
 				this.cmd(act.setHighlight, this.S2TableID[j], 1);
 				if (SHOW_ALGO) {
-				this.cmd(act.setForegroundColor, this.codeID[3][1], CODE_HIGHLIGHT_COLOR);
+				this.highlight(4, 1);
+				// this.cmd(act.setForegroundColor, this.codeID[4][1], CODE_HIGHLIGHT_COLOR);
 				}
 				if (SHOW_INFO) {
 				this.cmd(
@@ -186,12 +191,15 @@ export default class LCS extends Algorithm {
 				this.cmd(act.setHighlight, this.S1TableID[i], 0);
 				this.cmd(act.setHighlight, this.S2TableID[j], 0);
 				if (SHOW_ALGO) {
-				this.cmd(act.setForegroundColor, this.codeID[3][1], CODE_STANDARD_COLOR);
+				this.unhighlight(4, 1);
+				// this.cmd(act.setForegroundColor, this.codeID[4][1], CODE_STANDARD_COLOR);
 				}
 				if (str1.charAt(i) === str2.charAt(j)) {
 					if (SHOW_ALGO) {
-					this.cmd(act.setForegroundColor, this.codeID[4][0], CODE_HIGHLIGHT_COLOR);
-					this.cmd(act.setForegroundColor, this.codeID[4][1], CODE_HIGHLIGHT_COLOR);
+					// this.cmd(act.setForegroundColor, this.codeID[5][0], CODE_HIGHLIGHT_COLOR);
+					// this.cmd(act.setForegroundColor, this.codeID[5][1], CODE_HIGHLIGHT_COLOR);
+					this.highlight(5, 0);
+					this.highlight(5, 1);
 					}
 					this.cmd(act.setHighlight, this.tableID[i + 1 - 1][j + 1 - 1], 1);
 					if (SHOW_INFO) {
@@ -215,19 +223,19 @@ export default class LCS extends Algorithm {
 					this.cmd(act.step);
 					this.cmd(act.delete, moveID);
 					if (SHOW_ALGO) {
-					this.cmd(act.setForegroundColor, this.codeID[4][0], CODE_STANDARD_COLOR);
-					this.cmd(act.setForegroundColor, this.codeID[4][1], CODE_STANDARD_COLOR);
+					this.unhighlight(5, 0);
+					this.unhighlight(5, 1);
 					}
 					this.cmd(act.setHighlight, this.tableID[i + 1 - 1][j + 1 - 1], 0);
 					this.tableVals[i + 1][j + 1] = this.tableVals[i][j] + 1;
 					this.cmd(act.setText, this.tableID[i + 1][j + 1], this.tableVals[i + 1][j + 1]);
 				} else {
 					if (SHOW_ALGO) {
-					this.cmd(act.setForegroundColor, this.codeID[6][0], CODE_HIGHLIGHT_COLOR);
-					this.cmd(act.setForegroundColor, this.codeID[6][1], CODE_HIGHLIGHT_COLOR);
-					this.cmd(act.setForegroundColor, this.codeID[6][2], CODE_HIGHLIGHT_COLOR);
-					this.cmd(act.setForegroundColor, this.codeID[6][3], CODE_HIGHLIGHT_COLOR);
-					this.cmd(act.setForegroundColor, this.codeID[6][4], CODE_HIGHLIGHT_COLOR);
+					this.highlight(7, 0);
+					this.highlight(7, 1);
+					this.highlight(7, 2);
+					this.highlight(7, 3);
+					this.highlight(7, 4);
 					}
 					this.cmd(act.setHighlight, this.tableID[i][j + 1], 1);
 					this.cmd(act.setHighlight, this.tableID[i + 1][j], 1);
@@ -241,15 +249,15 @@ export default class LCS extends Algorithm {
 					this.cmd(act.step);
 
 					if (SHOW_ALGO) {
-					this.cmd(act.setForegroundColor, this.codeID[6][0], CODE_STANDARD_COLOR);
-					this.cmd(act.setForegroundColor, this.codeID[6][2], CODE_STANDARD_COLOR);
-					this.cmd(act.setForegroundColor, this.codeID[6][4], CODE_STANDARD_COLOR);
+					this.unhighlight(7, 0);
+					this.unhighlight(7, 2);
+					this.unhighlight(7, 4);
 					}
 
 					if (this.tableVals[i][j + 1] > this.tableVals[i + 1][j]) {
 						this.cmd(act.setHighlight, this.tableID[i + 1][j], 0);
 						if (SHOW_ALGO) {
-						this.cmd(act.setForegroundColor, this.codeID[6][3], CODE_STANDARD_COLOR);
+						this.unhighlight(7, 1);
 						}
 
 						this.tableVals[i + 1][j + 1] = this.tableVals[i][j + 1];
@@ -262,7 +270,7 @@ export default class LCS extends Algorithm {
 						);
 					} else {
 						if (SHOW_ALGO) {
-						this.cmd(act.setForegroundColor, this.codeID[6][1], CODE_STANDARD_COLOR);
+						this.unhighlight(7, 3);
 						}
 						this.cmd(act.setHighlight, this.tableID[i][j + 1], 0);
 						this.tableVals[i + 1][j + 1] = this.tableVals[i + 1][j];
@@ -286,12 +294,12 @@ export default class LCS extends Algorithm {
 					this.cmd(act.delete, moveID);
 					if (this.tableVals[i][j + 1] > this.tableVals[i + 1][j]) {
 						if (SHOW_ALGO) {
-						this.cmd(act.setForegroundColor, this.codeID[6][1], CODE_STANDARD_COLOR);
+						this.unhighlight(7, 3);
 						}
 						this.cmd(act.setHighlight, this.tableID[i][j + 1], 0);
 					} else {
 						if (SHOW_ALGO) {
-						this.cmd(act.setForegroundColor, this.codeID[6][3], CODE_STANDARD_COLOR);
+						this.unhighlight(7, 1);
 						}
 						this.cmd(act.setHighlight, this.tableID[i + 1][j], 0);
 					}
@@ -300,6 +308,11 @@ export default class LCS extends Algorithm {
 			}
 		}
 
+		this.highlight(9, 0);
+		this.highlight(10, 0);
+		this.highlight(11, 0);
+		this.highlight(12, 0);
+
 		if (SHOW_INFO) {
 		this.cmd(act.setText, this.infoLabelID, 'Finished building table, can now find LCS');
 		}
@@ -307,9 +320,14 @@ export default class LCS extends Algorithm {
 
 		this.buildLCSFromTable(str1, str2);
 
+		this.unhighlight(24, 0);
+		this.highlight(25, 0);
 		if (SHOW_INFO) {
 		this.cmd(act.setText, this.infoLabelID, 'Done');
 		}
+		this.cmd(act.step);
+		this.unhighlight(25, 0);
+
 		return this.commands;
 	}
 
@@ -440,10 +458,42 @@ export default class LCS extends Algorithm {
 				}
 			}
 		}
+		this.cmd(act.step);
+		this.unhighlight(9, 0);
+		this.unhighlight(10, 0);
+		this.unhighlight(11, 0);
+		this.unhighlight(12, 0);
 
 		while (currX > 0 && currY > 0) {
-			this.cmd(act.setHighlight, this.tableID[currX][currY], 1);
 			this.cmd(act.setBackgroundColor, this.tableID[currX][currY], LCS_CELL_COLOR);
+			this.cmd(act.step);
+
+			this.unhighlight(14, 1);
+			this.unhighlight(15, 1);
+			for (let i = 16; i < 24; i++) {
+				this.unhighlight(i, 0);
+			}
+
+			this.highlight(14, 1);
+			this.cmd(act.setHighlight, this.tableID[currX - 1][currY], 1);
+			this.cmd(act.setHighlight, this.tableID[currX][currY - 1], 1);
+			this.cmd(act.step);
+
+			this.unhighlight(14, 1);
+			this.cmd(act.setHighlight, this.tableID[currX - 1][currY], 0);
+			this.cmd(act.setHighlight, this.tableID[currX][currY - 1], 0);
+
+			if (this.tableVals[currX - 1][currY] === this.tableVals[currX][currY - 1]) {
+				this.highlight(15, 1);
+				this.cmd(act.setHighlight, this.tableID[currX][currY], 1);
+				this.cmd(act.setHighlight, this.tableID[currX - 1][currY - 1], 1);
+				this.cmd(act.step);
+
+				this.unhighlight(15, 1);
+
+				this.cmd(act.setHighlight, this.tableID[currX][currY], 0);
+				this.cmd(act.setHighlight, this.tableID[currX - 1][currY - 1], 0);
+			}
 
 			if (
 				this.tableVals[currX - 1][currY] === this.tableVals[currX][currY - 1] &&
@@ -465,15 +515,25 @@ export default class LCS extends Algorithm {
 			} else {
 				if (SHOW_INFO) {
 				if (this.tableVals[currX - 1][currY] > this.tableVals[currX][currY - 1]) {
+					this.highlight(20, 1);
+					this.cmd(act.setHighlight, this.tableID[currX - 1][currY], 1);
+					this.cmd(act.setHighlight, this.tableID[currX][currY - 1], 1);
+					this.cmd(act.step);
+
+					this.unhighlight(20, 1);
+					this.cmd(act.setHighlight, this.tableID[currX - 1][currY], 0);
+					this.cmd(act.setHighlight, this.tableID[currX][currY - 1], 0);
+					this.highlight(21, 0);
+
 					this.cmd(act.setText, this.infoLabelID, 'Move left');
 				} else {
+					this.highlight(23, 0);
+
 					this.cmd(act.setText, this.infoLabelID, 'Move up');
 				}
 				}
-				this.cmd(act.step);
+			        this.cmd(act.step); // Justus: does this belong here?
 			}
-
-			this.cmd(act.setHighlight, this.tableID[currX][currY], 0);
 
 			if (
 				this.tableVals[currX - 1][currY] === this.tableVals[currX][currY - 1] &&
@@ -500,16 +560,35 @@ export default class LCS extends Algorithm {
 					);
 				}
 
+				this.highlight(16, 0);
+				this.highlight(17, 0);
+				this.highlight(18, 0);
+
 				currX = currX - 1;
 				currY = currY - 1;
 			} else {
 				if (this.tableVals[currX - 1][currY] > this.tableVals[currX][currY - 1]) {
 					currX = currX - 1;
+					this.highlight(21, 0);
 				} else {
 					currY = currY - 1;
+					this.highlight(23, 0);
 				}
 			}
 		}
+		for (let i = 16; i < 24; i++) {
+			this.unhighlight(i, 0);
+		}
+		this.highlight(24, 0);
+		this.cmd(act.step);
+	}
+
+	highlight(ind1, ind2) {
+		this.cmd(act.setForegroundColor, this.codeID[ind1][ind2], CODE_HIGHLIGHT_COLOR);
+	}
+
+	unhighlight(ind1, ind2) {
+		this.cmd(act.setForegroundColor, this.codeID[ind1][ind2], CODE_STANDARD_COLOR);
 	}
 
 	enableUI() {

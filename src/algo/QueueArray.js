@@ -81,6 +81,7 @@ export default class QueueArray extends Algorithm {
 	addControls() {
 		this.controls = [];
 		this.enqueueField = addControlToAlgorithmBar('Text', '');
+		this.enqueueField.style.textAlign = 'center';
 		this.enqueueField.onkeydown = this.returnSubmit(
 			this.enqueueField,
 			this.enqueueCallback.bind(this),
@@ -567,8 +568,12 @@ export default class QueueArray extends Algorithm {
 		this.size = 0;
 		this.cmd(act.setText, this.frontID, '0');
 		this.cmd(act.setText, this.sizeID, '0');
-		this.cmd(act.setPosition, this.frontPointerID, ARRAY_START_X,
-			ARRAY_START_Y + FRONT_LABEL_OFFSET);
+		this.cmd(
+			act.setPosition,
+			this.frontPointerID,
+			ARRAY_START_X,
+			ARRAY_START_Y + FRONT_LABEL_OFFSET,
+		);
 		return this.commands;
 	}
 }

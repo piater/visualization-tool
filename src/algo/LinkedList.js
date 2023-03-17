@@ -49,6 +49,14 @@ const PUSH_LABEL_Y = 30;
 const PUSH_ELEMENT_X = 120;
 const PUSH_ELEMENT_Y = 30;
 
+const TOP_POS_X = 180;
+const TOP_POS_Y = 100;
+const TOP_LABEL_X = 130;
+const TOP_LABEL_Y = 100;
+
+const TOP_ELEM_WIDTH = 30;
+const TOP_ELEM_HEIGHT = 30;
+
 const SIZE = 32;
 
 export default class LinkedList extends Algorithm {
@@ -71,6 +79,7 @@ export default class LinkedList extends Algorithm {
 
 		// Add's value text field
 		this.addValueField = addControlToAlgorithmBar('Text', '', addTopHorizontalGroup);
+		this.addValueField.style.textAlign = 'center';
 		this.addValueField.onkeydown = this.returnSubmit(
 			this.addValueField,
 			() => this.addIndexCallback(),
@@ -83,6 +92,7 @@ export default class LinkedList extends Algorithm {
 
 		// Add's index text field
 		this.addIndexField = addControlToAlgorithmBar('Text', '', addTopHorizontalGroup);
+		this.addIndexField.style.textAlign = 'center';
 		this.addIndexField.onkeydown = this.returnSubmit(
 			this.addIndexField,
 			() => this.addIndexCallback(),
@@ -130,6 +140,7 @@ export default class LinkedList extends Algorithm {
 
 		// Remove's index text field
 		this.removeField = addControlToAlgorithmBar('Text', '', removeTopHorizontalGroup);
+		this.removeField.style.textAlign = 'center';
 		this.removeField.onkeydown = this.returnSubmit(
 			this.removeField,
 			() => this.removeIndexCallback(),
@@ -200,11 +211,27 @@ export default class LinkedList extends Algorithm {
 	setup() {
 		this.linkedListElemID = new Array(SIZE);
 
+		this.topID = this.nextIndex++;
+		this.topLabelID = this.nextIndex++;
+
 		this.arrayData = new Array(SIZE);
 		this.size = 0;
+		// this.top = 0;
 		this.leftoverLabelID = this.nextIndex++;
 
 		this.cmd(act.createLabel, this.leftoverLabelID, '', PUSH_LABEL_X, PUSH_LABEL_Y);
+
+		this.cmd(act.createLabel, this.topLabelID, 'Head', TOP_LABEL_X, TOP_LABEL_Y);
+		this.cmd(
+			act.createRectangle,
+			this.topID,
+			'',
+			TOP_ELEM_WIDTH,
+			TOP_ELEM_HEIGHT,
+			TOP_POS_X,
+			TOP_POS_Y,
+		);
+		this.cmd(act.setNull, this.topID, 1);
 
 		this.animationManager.startNewAnimation(this.commands);
 		this.animationManager.skipForward();
@@ -278,6 +305,17 @@ export default class LinkedList extends Algorithm {
 		this.implementAction(this.clearAll.bind(this));
 	}
 
+	traverse(index) {
+		for (let i = 0; i <= index; i++) {
+			this.cmd(act.step);
+			this.cmd(act.setHighlight, this.linkedListElemID[i], 1);
+			if (i > 0) {
+				this.cmd(act.setHighlight, this.linkedListElemID[i - 1], 0);
+			}
+		}
+		this.cmd(act.step);
+	}
+
 	add(elemToAdd, index) {
 		this.commands = [];
 
@@ -292,6 +330,8 @@ export default class LinkedList extends Algorithm {
 		this.linkedListElemID[index] = this.nextIndex++;
 
 		this.cmd(act.setText, this.leftoverLabelID, '');
+
+		this.traverse(index - 1);
 
 		this.cmd(
 			act.createLinkedListNode,
@@ -318,11 +358,15 @@ export default class LinkedList extends Algorithm {
 		this.cmd(act.delete, labPushValID);
 
 		if (index === this.size) {
+			// adding to back , dont need to do anything to head
 			this.cmd(act.setNull, this.linkedListElemID[index], 1);
 		}
 
 		if (this.size !== 0) {
 			if (index === 0) {
+				this.cmd(act.disconnect, this.topID, this.linkedListElemID[index + 1]);
+				this.cmd(act.connect, this.topID, this.linkedListElemID[index]);
+
 				this.cmd(
 					act.connect,
 					this.linkedListElemID[index],
@@ -352,7 +396,11 @@ export default class LinkedList extends Algorithm {
 					this.linkedListElemID[index + 1],
 				);
 			}
+		} else {
+			this.cmd(act.connect, this.topID, this.linkedListElemID[0]);
 		}
+
+		this.cmd(act.setHighlight, this.linkedListElemID[index - 1], 0);
 
 		this.cmd(act.step);
 		this.size = this.size + 1;
@@ -372,6 +420,8 @@ export default class LinkedList extends Algorithm {
 
 		this.cmd(act.setText, this.leftoverLabelID, '');
 
+		this.traverse(index - 1);
+
 		const nodePosX = LINKED_LIST_START_X + LINKED_LIST_ELEM_SPACING * index;
 		const nodePosY = LINKED_LIST_START_Y;
 		this.cmd(act.createLabel, labPopID, 'Removing Value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
@@ -381,7 +431,8 @@ export default class LinkedList extends Algorithm {
 
 		if (this.size !== 1) {
 			if (index === 0) {
-				//TODO: Move head pointer
+				this.cmd(act.disconnect, this.topID, this.linkedListElemID[index]);
+				this.cmd(act.connect, this.topID, this.linkedListElemID[index + 1]);
 			} else if (index === this.size - 1) {
 				this.cmd(
 					act.disconnect,
@@ -410,6 +461,8 @@ export default class LinkedList extends Algorithm {
 		}
 		this.cmd(act.step);
 		this.cmd(act.delete, this.linkedListElemID[index]);
+
+		this.cmd(act.setHighlight, this.linkedListElemID[index - 1], 0);
 
 		for (let i = index; i < this.size; i++) {
 			this.arrayData[i] = this.arrayData[i + 1];

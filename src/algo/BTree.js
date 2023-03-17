@@ -95,6 +95,7 @@ export default class BTree extends Algorithm {
 		this.controls = [];
 
 		this.insertField = addControlToAlgorithmBar('Text', '');
+		this.insertField.style.textAlign = 'center';
 		this.insertField.onkeydown = this.returnSubmit(
 			this.insertField,
 			this.insertCallback.bind(this),
@@ -110,6 +111,7 @@ export default class BTree extends Algorithm {
 		addDivisorToAlgorithmBar();
 
 		this.deleteField = addControlToAlgorithmBar('Text', '');
+		this.deleteField.style.textAlign = 'center';
 		this.deleteField.onkeydown = this.returnSubmit(
 			this.deleteField,
 			this.deleteCallback.bind(this),
@@ -125,6 +127,7 @@ export default class BTree extends Algorithm {
 		addDivisorToAlgorithmBar();
 
 		this.findField = addControlToAlgorithmBar('Text', '');
+		this.findField.style.textAlign = 'center';
 		this.findField.onkeydown = this.returnSubmit(
 			this.findField,
 			this.findCallback.bind(this),
@@ -162,6 +165,21 @@ export default class BTree extends Algorithm {
 		this.splitThirdSelect.onclick = () => (this.split_index = 2);
 		this.splitSecondSelect.checked = true;
 		this.split_index = 1;
+
+		addDivisorToAlgorithmBar();
+
+		const predSuccButtonList = addRadioButtonGroupToAlgorithmBar(
+			['Predecessor', 'Successor'],
+			'Predecessor/Successor',
+		);
+
+		this.predButton = predSuccButtonList[0];
+		this.succButton = predSuccButtonList[1];
+
+		this.predButton.onclick = this.predCallback.bind(this);
+		this.succButton.onclick = this.succCallback.bind(this);
+		this.succButton.checked = true;
+		this.predSucc = 'succ';
 	}
 
 	reset() {
@@ -194,6 +212,20 @@ export default class BTree extends Algorithm {
 			this.implementAction(this.changeDegree.bind(this), newMaxDegree);
 			this.animationManager.skipForward();
 			this.animationManager.clearHistory();
+		}
+	}
+
+	predCallback() {
+		if (this.predSucc !== 'pred') {
+			this.predSucc = 'pred';
+			//this.commands = this.clearCallback();  maybe this isn't necessary?
+		}
+	}
+
+	succCallback() {
+		if (this.predSucc !== 'succ') {
+			this.predSucc = 'succ';
+			//this.commands = this.clearCallback();
 		}
 	}
 
@@ -364,8 +396,10 @@ export default class BTree extends Algorithm {
 
 	findCallback() {
 		const findValue = this.normalizeNumber(this.findField.value, 4);
-		this.findField.value = '';
-		this.implementAction(this.findElement.bind(this), parseInt(findValue));
+		if (findValue !== '') {
+			this.findField.value = '';
+			this.implementAction(this.findElement.bind(this), parseInt(findValue));
+		}
 	}
 
 	findElement(findValue) {
@@ -504,6 +538,16 @@ export default class BTree extends Algorithm {
 	}
 
 	insertNotFull(tree, insertValue) {
+		if (
+			tree.keys.includes(insertValue) &&
+			tree.keys.findIndex(e => e === insertValue) < tree.numKeys
+		) {
+			this.cmd(act.setText, 0, `${insertValue} == ${insertValue}. Ignoring duplicate!`);
+			this.cmd(act.step);
+			this.cmd(act.setHighlight, tree.graphicID, 0);
+			return;
+		}
+
 		this.cmd(act.setHighlight, tree.graphicID, 1);
 		this.cmd(act.step);
 		if (tree.isLeaf) {
@@ -548,6 +592,17 @@ export default class BTree extends Algorithm {
 	insert(tree, insertValue) {
 		this.cmd(act.setHighlight, tree.graphicID, 1);
 		this.cmd(act.step);
+
+		if (
+			tree.keys.includes(insertValue) &&
+			tree.keys.findIndex(e => e === insertValue) < tree.numKeys
+		) {
+			this.cmd(act.setText, 0, `${insertValue} == ${insertValue}. Ignoring duplicate!`);
+			this.cmd(act.step);
+			this.cmd(act.setHighlight, tree.graphicID, 0);
+			return;
+		}
+
 		if (tree.isLeaf) {
 			this.cmd(
 				act.setText,
@@ -784,7 +839,7 @@ export default class BTree extends Algorithm {
 		} else {
 			this.doDelete(this.treeRoot, deletedValue);
 		}
-		if (this.treeRoot.numKeys === 0) {
+		if (this.treeRoot && this.treeRoot.numKeys === 0) {
 			this.cmd(act.step);
 			this.cmd(act.delete, this.treeRoot.graphicID);
 			this.treeRoot = this.treeRoot.children[0];
@@ -1083,25 +1138,48 @@ export default class BTree extends Algorithm {
 					this.repairAfterDelete(tree);
 					this.resizeTree();
 				} else {
-					let maxNode = tree.children[i];
-					while (!maxNode.isLeaf) {
+					let maxNode;
+					if (this.predSucc === 'pred') {
+						maxNode = tree.children[i];
+						while (!maxNode.isLeaf) {
+							this.cmd(act.setHighlight, maxNode.graphicID, 1);
+							this.cmd(act.step);
+							this.cmd(act.setHighlight, maxNode.graphicID, 0);
+							maxNode = maxNode.children[maxNode.numKeys];
+						}
 						this.cmd(act.setHighlight, maxNode.graphicID, 1);
-						this.cmd(act.step);
-						this.cmd(act.setHighlight, maxNode.graphicID, 0);
-						maxNode = maxNode.children[maxNode.numKeys];
+						tree.keys[i] = maxNode.keys[maxNode.numKeys - 1];
+						this.cmd(act.setTextColor, tree.graphicID, FOREGROUND_COLOR, i);
+						this.cmd(act.setText, tree.graphicID, '', i);
+						this.cmd(act.setText, maxNode.graphicID, '', maxNode.numKeys - 1);
+						this.cmd(
+							act.createLabel,
+							this.moveLabel1ID,
+							tree.keys[i],
+							this.getLabelX(maxNode, maxNode.numKeys - 1),
+							maxNode.y,
+						);
+					} else {
+						maxNode = tree.children[i + 1];
+						while (!maxNode.isLeaf) {
+							this.cmd(act.setHighlight, maxNode.graphicID, 1);
+							this.cmd(act.step);
+							this.cmd(act.setHighlight, maxNode.graphicID, 0);
+							maxNode = maxNode.children[0];
+						}
+						this.cmd(act.setHighlight, maxNode.graphicID, 1);
+						tree.keys[i] = maxNode.keys[0];
+						this.cmd(act.setTextColor, tree.graphicID, FOREGROUND_COLOR, i);
+						this.cmd(act.setText, tree.graphicID, '', i);
+						this.cmd(act.setText, maxNode.graphicID, '', 0);
+						this.cmd(
+							act.createLabel,
+							this.moveLabel1ID,
+							tree.keys[i],
+							this.getLabelX(maxNode, 0),
+							maxNode.y,
+						);
 					}
-					this.cmd(act.setHighlight, maxNode.graphicID, 1);
-					tree.keys[i] = maxNode.keys[maxNode.numKeys - 1];
-					this.cmd(act.setTextColor, tree.graphicID, FOREGROUND_COLOR, i);
-					this.cmd(act.setText, tree.graphicID, '', i);
-					this.cmd(act.setText, maxNode.graphicID, '', maxNode.numKeys - 1);
-					this.cmd(
-						act.createLabel,
-						this.moveLabel1ID,
-						tree.keys[i],
-						this.getLabelX(maxNode, maxNode.numKeys - 1),
-						maxNode.y,
-					);
 					this.cmd(act.move, this.moveLabel1ID, this.getLabelX(tree, i), tree.y);
 					this.cmd(act.step);
 					this.cmd(act.delete, this.moveLabel1ID);
@@ -1111,6 +1189,15 @@ export default class BTree extends Algorithm {
 					this.cmd(act.setHighlight, maxNode.graphicID, 0);
 					this.cmd(act.setHighlight, tree.graphicID, 0);
 
+					/* When setNumElements is called with the new #, it cuts of the last element
+					(like removeFromBack in an array). Removing the successor is more like 
+					removeFromFront so you need to shift elements left by 1*/
+					if (this.predSucc === 'succ') {
+						for (let j = 0; j < maxNode.numKeys; j++) {
+							maxNode.keys[j] = maxNode.keys[j + 1];
+							this.cmd(act.setText, maxNode.graphicID, maxNode.keys[j], j);
+						}
+					}
 					this.cmd(act.setNumElements, maxNode.graphicID, maxNode.numKeys);
 					this.repairAfterDelete(maxNode);
 					this.resizeTree();

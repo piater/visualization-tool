@@ -49,6 +49,15 @@ const PUSH_LABEL_Y = 30;
 const PUSH_ELEMENT_X = 120;
 const PUSH_ELEMENT_Y = 30;
 
+const HEAD_POS_X = 180;
+const HEAD_POS_Y = 100;
+
+const POINTER_LABEL_X = 130;
+const HEAD_LABEL_Y = 100;
+
+const POINTER_ELEM_WIDTH = 30;
+const POINTER_ELEM_HEIGHT = 30;
+
 const SIZE = 9;
 
 export default class CircularlyLinkedList extends Algorithm {
@@ -71,6 +80,7 @@ export default class CircularlyLinkedList extends Algorithm {
 
 		// Add's value text field
 		this.addValueField = addControlToAlgorithmBar('Text', '', addTopHorizontalGroup);
+		this.addValueField.style.textAlign = 'center';
 		this.addValueField.onkeydown = this.returnSubmit(
 			this.addValueField,
 			() => this.addIndexCallback(),
@@ -83,6 +93,7 @@ export default class CircularlyLinkedList extends Algorithm {
 
 		// Add's index text field
 		this.addIndexField = addControlToAlgorithmBar('Text', '', addTopHorizontalGroup);
+		this.addIndexField.style.textAlign = 'center';
 		this.addIndexField.onkeydown = this.returnSubmit(
 			this.addIndexField,
 			() => this.addIndexCallback(),
@@ -130,6 +141,7 @@ export default class CircularlyLinkedList extends Algorithm {
 
 		// Remove's index text field
 		this.removeField = addControlToAlgorithmBar('Text', '', removeTopHorizontalGroup);
+		this.removeField.style.textAlign = 'center';
 		this.removeField.onkeydown = this.returnSubmit(
 			this.removeField,
 			() => this.removeIndexCallback(),
@@ -199,6 +211,22 @@ export default class CircularlyLinkedList extends Algorithm {
 
 	setup() {
 		this.linkedListElemID = new Array(SIZE);
+
+		this.headID = this.nextIndex++;
+		this.headLabelID = this.nextIndex++;
+
+		this.cmd(act.createLabel, this.headLabelID, 'Head', POINTER_LABEL_X, HEAD_LABEL_Y);
+		this.cmd(
+			act.createRectangle,
+			this.headID,
+			'',
+			POINTER_ELEM_WIDTH,
+			POINTER_ELEM_HEIGHT,
+			HEAD_POS_X,
+			HEAD_POS_Y,
+		);
+
+		this.cmd(act.setNull, this.headID, 1);
 
 		this.arrayData = new Array(SIZE);
 		this.size = 0;
@@ -282,8 +310,23 @@ export default class CircularlyLinkedList extends Algorithm {
 		this.implementAction(this.clearAll.bind(this));
 	}
 
+	traverse(index) {
+		for (let i = 0; i <= index; i++) {
+			this.cmd(act.step);
+			this.cmd(act.setHighlight, this.linkedListElemID[i], 1);
+			if (i > 0) {
+				this.cmd(act.setHighlight, this.linkedListElemID[i - 1], 0);
+			}
+		}
+		this.cmd(act.step);
+	}
+
 	add(elemToAdd, index) {
 		this.commands = [];
+
+		if (index < this.size) {
+			this.traverse(index - 1);
+		}
 
 		const labPushID = this.nextIndex++;
 		const labPushValID = this.nextIndex++;
@@ -345,6 +388,7 @@ export default class CircularlyLinkedList extends Algorithm {
 			this.cmd(act.setText, this.linkedListElemID[0], elemToAdd);
 			this.cmd(act.delete, labPushValID);
 			this.cmd(act.connectCurve, this.linkedListElemID[0], this.linkedListElemID[0], -0.5);
+			this.cmd(act.connect, this.headID, this.linkedListElemID[0]);
 			this.cmd(act.step);
 
 			this.size = this.size + 1;
@@ -396,6 +440,7 @@ export default class CircularlyLinkedList extends Algorithm {
 				this.cmd(act.step);
 
 				this.size = this.size + 1;
+				this.cmd(act.connect, this.headID, this.linkedListElemID[0]);
 				this.resetNodePositions();
 				this.cmd(act.step);
 
@@ -403,6 +448,7 @@ export default class CircularlyLinkedList extends Algorithm {
 				if (index === this.size - 1) {
 					// We increment size above, so subtract one to check if adding to back
 					let i;
+					this.cmd(act.disconnect, this.headID, this.linkedListElemID[0]);
 					const firstNodeID = this.linkedListElemID[0];
 					for (i = 0; i < this.size - 1; i++) {
 						this.linkedListElemID[i] = this.linkedListElemID[i + 1];
@@ -422,6 +468,7 @@ export default class CircularlyLinkedList extends Algorithm {
 						(LINKED_LIST_START_X + lastX) / 2,
 						lastY + LINKED_LIST_ELEM_HEIGHT * 3,
 					);
+					this.cmd(act.connect, this.headID, this.linkedListElemID[0]);
 					this.cmd(act.step);
 
 					for (let i = 0; i < this.size - 1; i++) {
@@ -487,6 +534,8 @@ export default class CircularlyLinkedList extends Algorithm {
 			}
 		}
 
+		this.cmd(act.setHighlight, this.linkedListElemID[index - 1], 0);
+
 		this.cmd(act.delete, labPushID);
 		this.cmd(act.step);
 
@@ -499,6 +548,8 @@ export default class CircularlyLinkedList extends Algorithm {
 		index = parseInt(index);
 		const labPopID = this.nextIndex++;
 		const labPopValID = this.nextIndex++;
+
+		this.traverse(index - 1);
 
 		this.cmd(act.setText, this.leftoverLabelID, '');
 
@@ -601,6 +652,7 @@ export default class CircularlyLinkedList extends Algorithm {
 			}
 		} else {
 			this.cmd(act.delete, this.linkedListElemID[0]);
+			this.cmd(act.setNull, this.headID, 1);
 		}
 
 		for (let i = index; i < this.size; i++) {
@@ -608,6 +660,8 @@ export default class CircularlyLinkedList extends Algorithm {
 		}
 		this.size = this.size - 1;
 		this.resetNodePositions();
+
+		this.cmd(act.setHighlight, this.linkedListElemID[index - 1], 0);
 
 		this.cmd(act.delete, labPopValID);
 		this.cmd(act.delete, labPopID);
@@ -633,6 +687,7 @@ export default class CircularlyLinkedList extends Algorithm {
 			this.cmd(act.delete, this.linkedListElemID[i]);
 		}
 		this.size = 0;
+		this.cmd(act.setNull, this.headID, 1);
 		return this.commands;
 	}
 }

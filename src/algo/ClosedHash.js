@@ -24,523 +24,605 @@
 // authors and should not be interpreted as representing official policies, either expressed
 // or implied, of the University of San Francisco
 
-import { addDivisorToAlgorithmBar, addRadioButtonGroupToAlgorithmBar } from './Algorithm.js';
 import Hash from './Hash.js';
 import { act } from '../anim/AnimationMain';
 
-const ARRAY_ELEM_WIDTH = 90;	// Justus: 90; for abcdefghi: 130
-const ARRAY_ELEM_HEIGHT = 40;
-const ARRAY_ELEM_START_Y = 200;
-const ARRAY_VERTICAL_SEPARATION = 100;
+const POINTER_ARRAY_ELEM_WIDTH = 90;	// Justus: 90; for abcdefghi: 130
+const POINTER_ARRAY_ELEM_HEIGHT = 40;
+const POINTER_ARRAY_ELEM_START_X = 70;
+const POINTER_ARRAY_ELEM_START_Y = 200;
 
-const CLOSED_HASH_TABLE_SIZE = 7; // Justus
+const RESIZE_POINTER_ARRAY_ELEM_START_X = 670;
+const RESIZE_POINTER_ARRAY_ELEM_START_Y = 50;
+const RESIZE_LABEL_X = 800;
+const RESIZE_LABEL_Y = 20;
 
-const ARRAY_ELEM_START_X = 100;
-// If you want to center the array:
-// const ARRAY_ELEM_START_X = (window.screen.width - CLOSED_HASH_TABLE_SIZE * ARRAY_ELEM_WIDTH + ARRAY_ELEM_WIDTH) / 2;
-const ARRAY_RESIZE_ELEM_START_Y = 240;
-const ELEMS_PER_ROW = 14;
+const LINKED_ITEM_WIDTH = 110;
+const LINKED_ITEM_HEIGHT = 20;
+
+const LINKED_ITEM_INITIAL_X = 60;
+const LINKED_ITEM_INITIAL_Y = 40;
+const LINKED_ITEM_X_DELTA_INIT = 85;
+const LINKED_ITEM_X_DELTA = 100;
+
+const EXPLAIN_LABEL_X = 550;
+const EXPLAIN_LABEL_Y = 15;
+
+const HASH_TABLE_SIZE = 7;
+
+const DEFAULT_LOAD_FACTOR = 0.67;
 
 const LOAD_LABEL_X = 60;
 const LOAD_LABEL_Y = 20;
 
-const HASH2_LABEL_X = 270;
-const HASH2_LABEL_Y = 70;
-
-const RESIZE_LABEL_X = 400;
-const RESIZE_LABEL_Y = 20;
-
-const DEFAULT_LOAD_FACTOR = 0.67;
-
-const MAX_SIZE = 70;
+const MAX_SIZE = 30;
 
 const INDEX_COLOR = '#668721';
 
 export default class ClosedHash extends Hash {
 	constructor(am, w, h) {
 		super(am, w, h);
-		this.elements_per_row = ELEMS_PER_ROW;
-		//this.elements_per_row = Math.floor(w / ARRAY_ELEM_WIDTH) - 1;
-
+		this.nextIndex = 0;
+		this.POINTER_ARRAY_ELEM_Y = h - POINTER_ARRAY_ELEM_WIDTH;
 		this.setup();
 	}
 
 	addControls() {
 		super.addControls();
-
-		addDivisorToAlgorithmBar();
-
-		const radioButtonList = addRadioButtonGroupToAlgorithmBar(
-			[
-				'Linear Probing: f(i) = i',
-				'Quadratic Probing: f(i) = i * i',
-				'Double Hashing: f(i) = i * hash2(elem)',
-			],
-			'Collision Strategy: h(elem) + f(i)',
-		);
-		this.linearProblingButton = radioButtonList[0];
-		this.linearProblingButton.onclick = this.linearProbeCallback.bind(this);
-		this.quadraticProbingButton = radioButtonList[1];
-		this.quadraticProbingButton.onclick = this.quadraticProbeCallback.bind(this);
-		this.doubleHashingButton = radioButtonList[2];
-		this.doubleHashingButton.onclick = this.doubleHashingCallback.bind(this);
-
-		this.linearProblingButton.checked = true;
-		this.currentHashingTypeButtonState = this.linearProblingButton;
-
-		// Add new controls
+		this.restartButton.onclick = this.resizeInitialTableCall.bind(this);
 	}
 
-	changeProbeType(newProbingType) {
-		if (newProbingType === this.linearProblingButton) {
-			this.linearProblingButton.checked = true;
-			this.currentHashingTypeButtonState = this.linearProblingButton;
-			for (let i = 0; i < this.table_size; i++) {
-				this.skipDist[i] = i;
-			}
-		} else if (newProbingType === this.quadraticProbingButton) {
-			this.quadraticProbingButton.checked = true;
-			this.currentHashingTypeButtonState = this.quadraticProbingButton;
+	setup() {
+		this.initialCapacityField.value = HASH_TABLE_SIZE;
+		this.hashTableVisual = new Array(HASH_TABLE_SIZE);
+		this.hashTableIndices = new Array(HASH_TABLE_SIZE);
+		this.hashTableValues = new Array(HASH_TABLE_SIZE);
+		this.indexXPos = new Array(HASH_TABLE_SIZE);
+		this.indexYPos = new Array(HASH_TABLE_SIZE);
 
-			for (let i = 0; i < this.table_size; i++) {
-				this.skipDist[i] = i * i;
-			}
-		} else if (newProbingType === this.doubleHashingButton) {
-			this.doubleHashingButton.checked = true;
-			this.currentHashingTypeButtonState = this.doubleHashingButton;
-		}
-		this.commands = this.resetAll();
-		return this.commands;
-	}
+		this.ExplainLabel = this.nextIndex++;
 
-	quadraticProbeCallback() {
-		if (this.currentHashingTypeButtonState !== this.quadraticProbingButton) {
-			this.implementAction(this.changeProbeType.bind(this), this.quadraticProbingButton);
-		}
-	}
+		this.loadFactorID = this.nextIndex++;
 
-	doubleHashingCallback() {
-		if (this.currentHashingTypeButtonState !== this.doubleHashingButton) {
-			this.implementAction(this.changeProbeType.bind(this), this.doubleHashingButton);
-		}
-	}
+		this.size = 0;
 
-	linearProbeCallback() {
-		if (this.currentHashingTypeButtonState !== this.linearProblingButton) {
-			this.implementAction(this.changeProbeType.bind(this), this.linearProblingButton);
-		}
-	}
+		this.table_size = HASH_TABLE_SIZE;
 
-	insertElement(elem) {
+		this.load_factor = DEFAULT_LOAD_FACTOR;
+
+		this.resetIndex = this.nextIndex;
+
 		this.commands = [];
+		for (let i = 0; i < HASH_TABLE_SIZE; i++) {
+			let nextID = this.nextIndex++;
 
-		if (
-			(this.size + 1) / this.table_size > this.load_factor
-			&& this.table_size * 2 < MAX_SIZE
-		) {
-			this.resize(false);
-		}
-
-		this.cmd(act.setText, this.ExplainLabel, 'Inserting element: ' + String(elem));
-		this.cmd(act.step);
-
-		let index = this.doHash(elem);
-
-		index = this.getEmptyIndex(index, elem);
-
-		if (index === -2 && this.table_size * 2 < MAX_SIZE) {
-			this.resize(true);
-		} else if (index === -2) {
-			this.cmd(act.setText,
-				this.ExplainLabel,
-				`Array would normally resize after length number of probes,
-				however there just isn't enough space on the screen to resize. 
-				So here's a cute emoji of jack instead: V•ᴥ•V`
-				)
-			return this.commands;
-		}
-
-		if (index === -1) {
 			this.cmd(
-				act.setText,
-				this.ExplainLabel,
-				'Element ' + String(elem) + ' existiert bereits.',
+				act.createRectangle,
+				nextID,
+				'',
+				POINTER_ARRAY_ELEM_WIDTH,
+				POINTER_ARRAY_ELEM_HEIGHT,
+				POINTER_ARRAY_ELEM_START_X,
+				POINTER_ARRAY_ELEM_START_Y + i * POINTER_ARRAY_ELEM_HEIGHT,
 			);
-			return this.commands;
+			this.hashTableVisual[i] = nextID;
+			this.cmd(act.setNull, this.hashTableVisual[i], 1);
+
+			nextID = this.nextIndex++;
+			this.hashTableIndices[i] = nextID;
+			this.hashTableValues[i] = null;
+
+			this.indexXPos[i] = POINTER_ARRAY_ELEM_START_X - POINTER_ARRAY_ELEM_WIDTH;
+			this.indexYPos[i] = POINTER_ARRAY_ELEM_START_Y + i * POINTER_ARRAY_ELEM_HEIGHT;
+
+			this.cmd(act.createLabel, nextID, i, this.indexXPos[i], this.indexYPos[i]);
+			this.cmd(act.setForegroundColor, nextID, INDEX_COLOR);
 		}
-
-		const labID = this.nextIndex++;
-		this.cmd(act.createLabel, labID, elem, 20, 25);
-		this.cmd(
-			act.move,
-			labID,
-			this.indexXPos[index],
-			this.indexYPos[index] - ARRAY_ELEM_HEIGHT,
-		);
-		this.cmd(act.step);
-		this.cmd(act.delete, labID);
-		this.cmd(act.setText, this.hashTableVisual[index], elem);
-		this.cmd(act.setHighlight, this.hashTableVisual[index], 0);
-		this.hashTableValues[index] = elem;
-		this.empty[index] = false;
-		this.deleted[index] = false;
-		this.size++;
-
-		this.cmd(act.setText, this.ExplainLabel, '');
-		this.cmd(act.setText, this.DelIndexLabel, '');
-		return this.commands;
-	}
-
-	resetSkipDist(elem, labelID) {
-		const skipVal = this.nextLowestPrime - this.currHash % this.nextLowestPrime;
 		this.cmd(
 			act.createLabel,
-			labelID,
-			`hash2(${String(elem)}) = `
-			+ `${this.nextLowestPrime} - ${String(this.currHash)} % ${this.nextLowestPrime} = ${String(skipVal)}`,
-			HASH2_LABEL_X,
-			HASH2_LABEL_Y,
-			0,
+			this.loadFactorID,
+			`Load Factor: ${this.load_factor}`,
+			LOAD_LABEL_X,
+			LOAD_LABEL_Y,
 		);
-		this.skipDist[0] = 0;
-		for (let i = 1; i < this.table_size; i++) {
-			this.skipDist[i] = this.skipDist[i - 1] + skipVal;
-		}
-		return skipVal;
+		this.cmd(act.createLabel, this.ExplainLabel, '', EXPLAIN_LABEL_X, EXPLAIN_LABEL_Y, 0);
+		this.animationManager.startNewAnimation(this.commands);
+		this.animationManager.skipForward();
+		this.animationManager.clearHistory();
 	}
 
-	getEmptyIndex(index, elem) {
-		let HashID = -1;
-		let skipVal = 1;
-		if (this.currentHashingTypeButtonState === this.doubleHashingButton) {
-			HashID = this.nextIndex++;
-			skipVal = this.resetSkipDist(elem, HashID);
-		}
-
-		let probes = 0;
-		let removedIndex = -1;
-		const start = index;
-		this.cmd(act.setHighlight, this.hashTableVisual[index], 1);
-		while (
-			probes < this.table_size &&
-			!this.empty[index] &&
-			!(this.hashTableValues[index] === elem)
-		) {
-
-			this.cmd(act.setText, this.ExplainLabel, `Entry occupied, so probe forward`);
-			this.cmd(act.step);
-			// storing removed index
-			if (removedIndex === -1 && this.deleted[index]) {
-				this.cmd(act.setText, this.ExplainLabel, 'Storing index of first deleted element');
-				this.cmd(act.setText, this.DelIndexLabel, 'First Deleted Index: ' + index);
-				removedIndex = index;
-				this.cmd(act.step);
-			}
-			probes++;
-		
-			// increment index and clear labels
-			this.cmd(act.setHighlight, this.hashTableVisual[index], 0);
-			this.cmd(act.setText, this.ExplainLabel, '');
-
-			index = (start + this.skipDist[probes]) % this.table_size;
-
-			if (this.currentHashingTypeButtonState === this.quadraticProbingButton) {
-				skipVal = probes;
-			}
-
-			this.cmd(
-				act.setText,
-				this.HashIndexID,
-				`Index to probe: (${start} + ${probes}*${skipVal}) % ${this.table_size} =` 
-				+ ` ${(start + this.skipDist[probes]) % this.table_size}`
-			);
-
-			this.cmd(act.setHighlight, this.hashTableVisual[index], 1);
-			if (this.empty[index]) {
-				this.cmd(
-					act.setText,
-					this.ExplainLabel,
-					'Encountered null spot, so terminate loop',
-				);
-			} else if (this.hashTableValues[index] === elem) {
-				this.cmd(
-					act.setText,
-					this.ExplainLabel,
-					`Encountered matching key, so terminate loop`,
-				);
-			}
-			this.cmd(act.step);
-		}
-
-		this.cmd(act.setText, this.HashIndexID, '');
-
-		if (HashID !== -1) {
-			this.cmd(act.delete, HashID);
-			this.nextIndex--;
-		}
-
-		if (!this.empty[index] && this.hashTableValues[index] === elem && !this.deleted[index]) {
-			this.cmd(act.setHighlight, this.hashTableVisual[index], 0);
-			return -1;
-		} else if (probes === this.table_size && removedIndex === -1) {
-			this.cmd(act.setHighlight, this.hashTableVisual[index], 0);
-			return -2;
-		} else {
-			if (removedIndex !== -1) {
-				this.cmd(act.setHighlight, this.hashTableVisual[index], 0);
-				this.cmd(act.setText, this.ExplainLabel, 'Inserting at earlier DEL spot');
-				index = removedIndex;
-			} else if (this.hashTableValues[index] === elem) {
-				this.cmd(act.setText, this.ExplainLabel, 'Inserting at DEL spot with same key')
-			} else {
-				this.cmd(act.setText, this.ExplainLabel, 'Inserting at null spot');
-			}
-			this.cmd(act.setHighlight, this.hashTableVisual[index], 1);
-			this.cmd(act.step);
-			return removedIndex !== -1 ? removedIndex : index;
-		}
+	resizeInitialTableCall() {
+		this.implementAction(this.resizeInitialTable.bind(this));
 	}
 
-	getElemIndex(index, elem) {
-		let HashID = -1;
-		let skipVal = 1;
-		if (this.currentHashingTypeButtonState === this.doubleHashingButton) {
-			HashID = this.nextIndex++;
-			skipVal = this.resetSkipDist(elem, HashID);
-		}
-		
-		const start = index;
-		let foundIndex = -1;
+	resizeInitialTable() {
+		// Make command stack empty, and clear the elements of the list.
+		this.commands = [];
+		//Delete current hashTable
+		this.oldHashTableVisual = this.hashTableVisual;
+		this.oldHashTableIndices = this.hashTableIndices;
 		for (let i = 0; i < this.table_size; i++) {
-			const candidateIndex = (index + this.skipDist[i]) % this.table_size;
-			this.cmd(act.setHighlight, this.hashTableVisual[candidateIndex], 1);
+			this.cmd(act.setNull, this.oldHashTableVisual[i], 1);
+			this.cmd(act.delete, this.oldHashTableVisual[i]);
+			this.cmd(act.delete, this.oldHashTableIndices[i]);
+		}
+
+		if (this.initialCapacityField !== '') {
+			this.table_size = parseInt(this.initialCapacityField.value)
+				? Math.min(Math.max(0, parseInt(this.initialCapacityField.value)), MAX_SIZE)
+				: HASH_TABLE_SIZE;
+		}
+
+		if (this.table_size * 2 + 1 > MAX_SIZE) {
+			this.load_factor = 0.99;
+			this.cmd(
+				act.setText,
+				this.loadFactorID,
+				`Load Factor: ${this.load_factor}
+				(Array Length too large for resize)`,
+			);
 			this.cmd(act.step);
-			this.cmd(act.setHighlight, this.hashTableVisual[candidateIndex], 0);
-			if (
-				!this.empty[candidateIndex] &&
-				!this.deleted[candidateIndex] &&
-				this.hashTableValues[candidateIndex] === elem
-			) {
-				foundIndex = candidateIndex;
-				break;
-			} else if (this.empty[candidateIndex]) {
-				break;
-			}
-			
-			if (this.currentHashingTypeButtonState === this.quadraticProbingButton) {
-				skipVal = i + 1;
-			}
+		} else {
+			this.load_factor = DEFAULT_LOAD_FACTOR;
+			this.cmd(act.step);
+		}
+		this.hashTableVisual = new Array(this.table_size);
+		this.hashTableIndices = new Array(this.table_size);
+		this.indexXPos = new Array(this.table_size);
+		this.indexYPos = new Array(this.table_size);
+
+		for (let i = 0; i < this.table_size; i++) {
+			let nextID = this.nextIndex++;
 
 			this.cmd(
-				act.setText,
-				this.HashIndexID,
-				`Index to probe: (${start} + ${i + 1}*${skipVal}) % ${this.table_size} =` 
-				+ ` ${(start + this.skipDist[i + 1]) % this.table_size}`
+				act.createRectangle,
+				nextID,
+				'',
+				POINTER_ARRAY_ELEM_WIDTH,
+				POINTER_ARRAY_ELEM_HEIGHT,
+				POINTER_ARRAY_ELEM_START_X,
+				POINTER_ARRAY_ELEM_START_Y + i * POINTER_ARRAY_ELEM_HEIGHT,
 			);
+			this.hashTableVisual[i] = nextID;
+			this.cmd(act.setNull, this.hashTableVisual[i], 1);
+
+			nextID = this.nextIndex++;
+			this.hashTableIndices[i] = nextID;
+
+			this.indexXPos[i] = POINTER_ARRAY_ELEM_START_X - POINTER_ARRAY_ELEM_WIDTH;
+			this.indexYPos[i] = POINTER_ARRAY_ELEM_START_Y + i * POINTER_ARRAY_ELEM_HEIGHT;
+
+			this.cmd(act.createLabel, nextID, i, this.indexXPos[i], this.indexYPos[i]);
+			this.cmd(act.setForegroundColor, nextID, INDEX_COLOR);
 		}
 
-		this.cmd(act.setText, this.HashIndexID, '');
-		if (HashID !== -1) {
-			this.cmd(act.delete, HashID);
+		if (this.size !== 0) {
+			for (let i = 0; i < this.hashTableValues.length; i++) {
+				let node = this.hashTableValues[i];
+				if (node != null) {
+					this.cmd(act.delete, node.graphicID);
+					while (node.next != null) {
+						node = node.next;
+						this.cmd(act.delete, node.graphicID);
+					}
+				}
+			}
+
+			this.hashTableValues = new Array(HASH_TABLE_SIZE);
+			this.size = 0;
+		}
+
+		return this.commands;
+	}
+
+	insertElement(key, value) {
+		const elem = `<${key}, ${value}>`;
+		this.commands = [];
+
+		this.cmd(act.setText, this.loadFactorID, `Load Factor: ${this.load_factor}`);
+
+		if (
+			(this.size + 1) / this.table_size > this.load_factor &&
+			this.table_size * 2 + 1 < MAX_SIZE
+		) {
+			this.resize();
+		}
+
+		this.cmd(act.setText, this.ExplainLabel, 'Inserting element ' + elem);
+		const node = new LinkedListNode(
+			key,
+			value,
+			this.nextIndex++,
+			LINKED_ITEM_INITIAL_X,
+			LINKED_ITEM_INITIAL_Y,
+		);
+		this.cmd(
+			act.createLinkedListNode,
+			node.graphicID,
+			elem,
+			LINKED_ITEM_WIDTH,
+			LINKED_ITEM_HEIGHT,
+			LINKED_ITEM_INITIAL_X,
+			LINKED_ITEM_INITIAL_Y,
+			0.25,
+			0,
+			1,
+		);
+
+		const index = this.doHash(key);
+
+		let found = false;
+		let prev = null;
+		let old;
+		if (this.hashTableValues[index] != null) {
+			// Search for duplicates
+			this.cmd(act.setText, this.ExplainLabel, 'Searching for duplicates of ' + key);
+
+			const compareIndex = this.nextIndex++;
+			let tmp = this.hashTableValues[index];
+			this.cmd(act.createLabel, compareIndex, '', EXPLAIN_LABEL_X, EXPLAIN_LABEL_Y + 30, 0);
+			while (tmp != null && !found) {
+				this.cmd(act.setHighlight, tmp.graphicID, 1);
+				if (tmp.key === key) {
+					this.cmd(act.setText, compareIndex, tmp.key + '==' + key);
+					old = tmp;
+					found = true;
+					this.cmd(act.step);
+					this.cmd(act.setHighlight, tmp.graphicID, 0);
+					break;
+				} else {
+					this.cmd(act.setText, compareIndex, tmp.key + ' != ' + key);
+				}
+				this.cmd(act.step);
+				this.cmd(act.setHighlight, tmp.graphicID, 0);
+				prev = tmp;
+				tmp = tmp.next;
+			}
+
+			this.cmd(act.delete, compareIndex);
 			this.nextIndex--;
-		}
-
-		return foundIndex;
-	}
-
-	deleteElement(elem) {
-		this.commands = [];
-		this.cmd(act.setText, this.ExplainLabel, 'Entferne Element: ' + elem);
-		let index = this.doHash(elem);
-
-		index = this.getElemIndex(index, elem);
-
-		if (index >= 0) {
-			this.cmd(
-				act.setText,
-				this.ExplainLabel,
-				'Entferne Element: ' + elem + '  Element entfernt',
-			);
-			// this.empty[index] = true;
-			this.deleted[index] = true;
-			this.cmd(act.setText, this.hashTableVisual[index], '<deleted>');
-			this.size--;
 		} else {
-			this.cmd(
-				act.setText,
-				this.ExplainLabel,
-				'Entferne Element: ' + elem + '  Element existiert nicht',
-			);
+			this.cmd(act.setNull, node.graphicID, 1);
+			this.cmd(act.setNull, this.hashTableVisual[index], 0);
 		}
-		return this.commands;
-	}
 
-	findElement(elem) {
-		this.commands = [];
-
-		this.cmd(act.setText, this.ExplainLabel, 'Suche Element: ' + elem);
-		const index = this.doHash(elem);
-
-		const found = this.getElemIndex(index, elem) !== -1;
 		if (found) {
-			this.cmd(act.setText, this.ExplainLabel, 'Suche Element: ' + elem + '  gefunden!');
+			this.cmd(
+				act.setText,
+				this.ExplainLabel,
+				'Key ' + key + ' is already in HashMap, updating value.',
+			);
+			this.cmd(act.delete, old.graphicID);
+			node.next = old.next;
+
+			if (prev != null) {
+				prev.next = node;
+				this.cmd(act.connect, prev.graphicID, node.graphicID);
+			} else {
+				this.cmd(
+					act.disconnect,
+					this.hashTableVisual[index],
+					this.hashTableValues[index].graphicID,
+				);
+				this.cmd(act.connect, this.hashTableVisual[index], node.graphicID);
+				this.hashTableValues[index] = node;
+			}
+			if (node.next != null) {
+				this.cmd(act.connect, node.graphicID, node.next.graphicID);
+			} else {
+				this.cmd(act.setNull, node.graphicID, 1);
+			}
+
+			this.repositionList(index, this.hashTableValues[index]);
+			this.cmd(act.step);
 		} else {
-			this.cmd(act.setText, this.ExplainLabel, 'Suche Element: ' + elem + '  nicht gefunden!');
+			this.cmd(act.setText, this.ExplainLabel, 'Duplicate of ' + key + ' not found!');
+			this.cmd(act.step);
+
+			if (this.hashTableValues[index] != null) {
+				this.cmd(act.connect, node.graphicID, this.hashTableValues[index].graphicID);
+				this.cmd(
+					act.disconnect,
+					this.hashTableVisual[index],
+					this.hashTableValues[index].graphicID,
+				);
+			}
+
+			this.cmd(act.connect, this.hashTableVisual[index], node.graphicID);
+			node.next = this.hashTableValues[index];
+			this.hashTableValues[index] = node;
+			this.repositionList(index, this.hashTableValues[index]);
+			this.size++;
+		}
+		this.cmd(act.setText, this.ExplainLabel, '');
+
+		return this.commands;
+	}
+
+	repositionList(index, tmp) {
+		let startX = POINTER_ARRAY_ELEM_START_X + LINKED_ITEM_X_DELTA_INIT;
+		const startY = POINTER_ARRAY_ELEM_START_Y + index * POINTER_ARRAY_ELEM_HEIGHT;
+		// let tmp = this.hashTableValues[index];
+		while (tmp != null) {
+			tmp.x = startX;
+			tmp.y = startY;
+			this.cmd(act.move, tmp.graphicID, tmp.x, tmp.y);
+			startX = startX + LINKED_ITEM_X_DELTA;
+			tmp = tmp.next;
+		}
+	}
+
+	repositionResizeList(index) {
+		let startX = RESIZE_POINTER_ARRAY_ELEM_START_X + LINKED_ITEM_X_DELTA_INIT;
+		const startY = RESIZE_POINTER_ARRAY_ELEM_START_Y + index * POINTER_ARRAY_ELEM_HEIGHT;
+		let tmp = this.hashTableValues[index];
+		while (tmp != null) {
+			tmp.x = startX;
+			tmp.y = startY;
+			this.cmd(act.move, tmp.graphicID, tmp.x, tmp.y);
+			startX = startX + LINKED_ITEM_X_DELTA;
+			tmp = tmp.next;
+		}
+	}
+
+	deleteElement(key) {
+		this.commands = [];
+		this.cmd(act.setText, this.ExplainLabel, 'Deleting entry with key: ' + key);
+		const index = this.doHash(key);
+		if (this.hashTableValues[index] == null) {
+			this.cmd(
+				act.setText,
+				this.ExplainLabel,
+				'Deleting entry with key: ' + key + '  Key not in table',
+			);
+			return this.commands;
+		}
+		this.cmd(act.setHighlight, this.hashTableValues[index].graphicID, 1);
+		this.cmd(act.step);
+		this.cmd(act.setHighlight, this.hashTableValues[index].graphicID, 0);
+		if (this.hashTableValues[index].key === key) {
+			if (this.hashTableValues[index].next != null) {
+				this.cmd(
+					act.connect,
+					this.hashTableVisual[index],
+					this.hashTableValues[index].next.graphicID,
+				);
+			} else {
+				this.cmd(act.setNull, this.hashTableVisual[index], 1);
+			}
+			this.cmd(act.delete, this.hashTableValues[index].graphicID);
+			this.hashTableValues[index] = this.hashTableValues[index].next;
+			this.repositionList(index, this.hashTableValues[index]);
+			this.size--;
+			return this.commands;
+		}
+		let tmpPrev = this.hashTableValues[index];
+		let tmp = this.hashTableValues[index].next;
+		let found = false;
+		while (tmp != null && !found) {
+			this.cmd(act.setHighlight, tmp.graphicID, 1);
+			this.cmd(act.step);
+			this.cmd(act.setHighlight, tmp.graphicID, 0);
+			if (tmp.key === key) {
+				found = true;
+				this.cmd(
+					act.setText,
+					this.ExplainLabel,
+					'Deleting entry with key: ' + key + '  Entry deleted',
+				);
+				if (tmp.next != null) {
+					this.cmd(act.connect, tmpPrev.graphicID, tmp.next.graphicID);
+				} else {
+					this.cmd(act.setNull, tmpPrev.graphicID, 1);
+				}
+				tmpPrev.next = tmpPrev.next.next;
+				this.cmd(act.delete, tmp.graphicID);
+				this.repositionList(index, this.hashTableValues[index]);
+				this.size--;
+			} else {
+				tmpPrev = tmp;
+				tmp = tmp.next;
+			}
+		}
+		if (!found) {
+			this.cmd(
+				act.setText,
+				this.ExplainLabel,
+				'Deleting entry with key: ' + key + '  Key not in table',
+			);
 		}
 		return this.commands;
 	}
 
-	resize(fromCycle) {
-		this.commands = []; 
+	findElement(key) {
+		this.commands = [];
+		this.cmd(act.setText, this.ExplainLabel, 'Finding entry with key: ' + key);
+
+		const index = this.doHash(key);
+		const compareIndex = this.nextIndex++;
+		let found = false;
+		let tmp = this.hashTableValues[index];
+		let value = null;
+		this.cmd(act.createLabel, compareIndex, '', 10, 40, 0);
+		while (tmp != null && !found) {
+			this.cmd(act.setHighlight, tmp.graphicID, 1);
+			if (tmp.key === key) {
+				this.cmd(act.setText, compareIndex, tmp.key + '==' + key);
+				found = true;
+				value = tmp.val;
+			} else {
+				this.cmd(act.setText, compareIndex, tmp.key + '!=' + key);
+			}
+			this.cmd(act.step);
+			this.cmd(act.setHighlight, tmp.graphicID, 0);
+			tmp = tmp.next;
+		}
+		if (found) {
+			this.cmd(
+				act.setText,
+				this.ExplainLabel,
+				'Found entry with key: ' + key + '  Value: ' + value,
+			);
+		} else {
+			this.cmd(
+				act.setText,
+				this.ExplainLabel,
+				'Finding entry with key: ' + key + '  Not Found!',
+			);
+		}
+		this.cmd(act.delete, compareIndex);
+		this.nextIndex--;
+		return this.commands;
+	}
+
+	resize() {
+		this.commands = [];
 
 		this.cmd(act.setText, this.ExplainLabel, '');
-		this.cmd(act.setText, this.DelIndexLabel, '');
 
 		const resizeLabel = this.nextIndex++;
-		if (!fromCycle) {
-			this.cmd(
-				act.createLabel,
-				resizeLabel, 
-				`(Resize Required): (Size + 1 / length) > Load Factor --> (${this.size + 1} / ${this.table_size}) > ${this.load_factor}`,
-				RESIZE_LABEL_X,
-				RESIZE_LABEL_Y
-			);
-		} else {
-			this.cmd(
-				act.createLabel,
-				resizeLabel, 
-				`(Resize Required): ${this.table_size} elements probed`,
-				RESIZE_LABEL_X,
-				RESIZE_LABEL_Y
-			);
-		}
+		this.cmd(
+			act.createLabel,
+			resizeLabel,
+			`(Resize Required): (Size + 1.0 / length) > Load Factor --> (${this.size} + 1.0 / ${this.table_size}) > ${this.load_factor}`,
+			RESIZE_LABEL_X,
+			RESIZE_LABEL_Y,
+		);
 
 		this.table_size = this.table_size * 2 + 1;
 
-		if (this.table_size * 2 > MAX_SIZE) {
+		if (this.table_size * 2 + 1 > MAX_SIZE) {
 			this.load_factor = 0.99;
 			this.cmd(act.setText, this.loadFactorID, `Load Factor: ${this.load_factor}`);
 		}
 
 		this.cmd(act.step);
-		
 
 		this.oldHashTableVisual = this.hashTableVisual;
 		this.oldHashTableValues = this.hashTableValues;
-		this.oldskipDist = this.skipDist;
-		this.oldempty = this.empty;
-		this.olddeleted = this.deleted;
+		this.oldHashTableIndices = this.hashTableIndices;
 		this.oldIndexXPos = this.indexXPos;
 		this.oldIndexYPos = this.indexYPos;
-		this.oldindexLabelID = this.indexLabelID;
 
 		this.hashTableValues = new Array(this.table_size);
 		this.hashTableVisual = new Array(this.table_size);
-		this.skipDist = new Array(this.table_size);
-		this.empty = new Array(this.table_size);
-		this.deleted = new Array(this.table_size);
+		this.hashTableIndices = new Array(this.table_size);
 		this.indexXPos = new Array(this.table_size);
 		this.indexYPos = new Array(this.table_size);
-		this.indexLabelID = new Array(this.table_size);
-
-		if (this.currentHashingTypeButtonState === this.linearProblingButton) {
-			for (let i = 0; i < this.table_size; i++) {
-				this.skipDist[i] = i;
-			}
-		} else if (this.currentHashingTypeButtonState === this.quadraticProbingButton) {
-			for (let i = 0; i < this.table_size; i++) {
-				this.skipDist[i] = i * i;
-			}
-		}
 
 		for (let i = 0; i < this.table_size; i++) {
+			let nextID = this.nextIndex++;
 
-			this.hashTableVisual[i] = this.nextIndex++;
-			this.empty[i] = true;
-			this.deleted[i] = false;
-
-			const nextXPos = ARRAY_ELEM_START_X + (i % this.elements_per_row) * ARRAY_ELEM_WIDTH;
-			const nextYPos =
-				ARRAY_RESIZE_ELEM_START_Y +
-				Math.floor(i / this.elements_per_row) * ARRAY_VERTICAL_SEPARATION;
 			this.cmd(
 				act.createRectangle,
-				this.hashTableVisual[i],
+				nextID,
 				'',
-				ARRAY_ELEM_WIDTH,
-				ARRAY_ELEM_HEIGHT,
-				nextXPos,
-				nextYPos,
+				POINTER_ARRAY_ELEM_WIDTH,
+				POINTER_ARRAY_ELEM_HEIGHT,
+				RESIZE_POINTER_ARRAY_ELEM_START_X,
+				RESIZE_POINTER_ARRAY_ELEM_START_Y + i * POINTER_ARRAY_ELEM_HEIGHT,
 			);
-			this.indexLabelID[i] = this.nextIndex++;
-			this.indexXPos[i] = nextXPos;
-			this.indexYPos[i] = nextYPos + ARRAY_ELEM_HEIGHT;
+			this.hashTableVisual[i] = nextID;
+			this.cmd(act.setNull, this.hashTableVisual[i], 1);
 
-			this.cmd(act.createLabel, this.indexLabelID[i], i, this.indexXPos[i], this.indexYPos[i]);
-			this.cmd(act.setForegroundColor, this.indexLabelID[i], INDEX_COLOR);
+			nextID = this.nextIndex++;
+			this.hashTableIndices[i] = nextID;
+			this.hashTableValues[i] = null;
+
+			this.indexXPos[i] = RESIZE_POINTER_ARRAY_ELEM_START_X - POINTER_ARRAY_ELEM_WIDTH;
+			this.indexYPos[i] = RESIZE_POINTER_ARRAY_ELEM_START_Y + i * POINTER_ARRAY_ELEM_HEIGHT;
+
+			this.cmd(act.createLabel, nextID, i, this.indexXPos[i], this.indexYPos[i]);
+			this.cmd(act.setForegroundColor, nextID, INDEX_COLOR);
 		}
-		this.cmd(act.step);
 
-		let elementsMoved = 0;
-
-		for (let i = 0; i < this.table_size / 2 && elementsMoved < this.size; i++) {
-
+		for (let i = 0; i < (this.table_size - 1) / 2; i++) {
 			this.cmd(act.setHighlight, this.oldHashTableVisual[i], 1);
 			this.cmd(act.step);
 
-			if (!this.oldempty[i] && !this.olddeleted[i]) {
-				const oldElement = this.oldHashTableValues[i];
+			while (this.oldHashTableValues[i] != null) {
+				this.cmd(act.setHighlight, this.oldHashTableVisual[i], 0);
 
-				let index = this.doHash(oldElement);
+				const node = this.oldHashTableValues[i];
+				this.cmd(act.setHighlight, node.graphicID, 1);
+				this.cmd(act.step);
 
-				index = this.getEmptyIndex(index, oldElement);
+				this.cmd(act.move, node.graphicID, LINKED_ITEM_INITIAL_X, LINKED_ITEM_INITIAL_Y);
 
-				if (index !== -1) {
-					const labID = this.nextIndex++;
-					this.cmd(act.createLabel, labID, oldElement, this.oldIndexXPos[i], this.oldIndexYPos[i] - ARRAY_ELEM_HEIGHT);
+				this.oldHashTableValues[i] = this.oldHashTableValues[i].next;
+
+				this.cmd(act.disconnect, this.oldHashTableVisual[i], node.graphicID);
+				if (this.oldHashTableValues[i] != null) {
 					this.cmd(
-						act.move,
-						labID,
-						this.indexXPos[index],
-						this.indexYPos[index] - ARRAY_ELEM_HEIGHT,
+						act.connect,
+						this.oldHashTableVisual[i],
+						this.oldHashTableValues[i].graphicID,
 					);
-					this.cmd(act.step);
-					this.cmd(act.delete, labID);
-					this.cmd(act.setText, this.hashTableVisual[index], oldElement);
-					this.cmd(act.setHighlight, this.hashTableVisual[index], 0);
-					this.hashTableValues[index] = oldElement;
-					this.empty[index] = false;
-					this.deleted[index] = false;
-					elementsMoved++;
+					this.cmd(act.disconnect, node.graphicID, this.oldHashTableValues[i].graphicID);
+					this.repositionList(i, this.oldHashTableValues[i]);
+				} else {
+					this.cmd(act.setNull, this.oldHashTableVisual[i], 1);
 				}
-			}
+				this.cmd(act.step);
 
+				const index = this.doHash(node.key);
+
+				node.next = this.hashTableValues[index];
+				this.cmd(act.setNull, node.graphicID, 1);
+				this.cmd(act.setNull, this.hashTableVisual[index], 0);
+
+				if (node.next != null) {
+					this.cmd(act.disconnect, this.hashTableVisual[index], node.next.graphicID);
+					this.cmd(act.connect, node.graphicID, node.next.graphicID);
+				}
+				this.cmd(act.connect, this.hashTableVisual[index], node.graphicID);
+				this.hashTableValues[index] = node;
+				this.repositionResizeList(index);
+
+				this.cmd(act.setHighlight, node.graphicID, 0);
+			}
 			this.cmd(act.setHighlight, this.oldHashTableVisual[i], 0);
+		}
+		this.cmd(act.step);
+
+		for (let i = 0; i < (this.table_size - 1) / 2; i++) {
+			this.cmd(act.setNull, this.oldHashTableVisual[i], 1);
+			this.cmd(act.delete, this.oldHashTableVisual[i]);
+			this.cmd(act.delete, this.oldHashTableIndices[i]);
+		}
+
+		for (let i = 0; i < this.table_size; i++) {
+			const xpos = POINTER_ARRAY_ELEM_START_X;
+			const ypos = POINTER_ARRAY_ELEM_START_Y + i * POINTER_ARRAY_ELEM_HEIGHT;
+
+			this.indexXPos[i] = POINTER_ARRAY_ELEM_START_X - POINTER_ARRAY_ELEM_WIDTH;
+			this.indexYPos[i] = POINTER_ARRAY_ELEM_START_Y + i * POINTER_ARRAY_ELEM_HEIGHT;
+
+			this.cmd(act.move, this.hashTableVisual[i], xpos, ypos);
+			this.cmd(act.move, this.hashTableIndices[i], xpos - POINTER_ARRAY_ELEM_WIDTH, ypos);
+
+			let index = 0;
+			let tmp = this.hashTableValues[i];
+			while (tmp != null) {
+				this.cmd(
+					act.move,
+					tmp.graphicID,
+					xpos + LINKED_ITEM_X_DELTA_INIT + LINKED_ITEM_X_DELTA * index,
+					ypos,
+				);
+				index++;
+				tmp = tmp.next;
+			}
 		}
 
 		this.cmd(act.delete, resizeLabel);
-
-		for (let i = 0; i < this.table_size; i++) {
-			const nextXPos = ARRAY_ELEM_START_X + (i % this.elements_per_row) * ARRAY_ELEM_WIDTH;
-			const nextYPos =
-				ARRAY_ELEM_START_Y +
-				Math.floor(i / this.elements_per_row) * ARRAY_VERTICAL_SEPARATION;
-			if (i < (this.table_size - 1) / 2) {
-				this.cmd(act.delete, this.oldHashTableVisual[i]);
-				this.cmd(act.delete, this.oldindexLabelID[i]);
-			}
-			this.cmd(act.move, this.hashTableVisual[i], nextXPos, nextYPos);
-			this.cmd(act.move, this.indexLabelID[i], nextXPos, nextYPos + ARRAY_ELEM_HEIGHT);
-			this.indexYPos[i] = nextYPos + ARRAY_ELEM_HEIGHT;
-		}
-
-		return this.commands;
+		this.cmd(act.step);
 	}
 
 	changeLoadFactor(LF) {
 		this.commands = [];
 
-		if (this.table_size * 2 < MAX_SIZE) {
+		if (this.table_size * 2 + 1 <= MAX_SIZE) {
 			this.load_factor = LF;
 			this.cmd(act.setText, this.loadFactorID, `Load Factor: ${this.load_factor}`);
 		} else {
@@ -548,7 +630,7 @@ export default class ClosedHash extends Hash {
 				act.setText,
 				this.loadFactorID,
 				`Load Factor: ${this.load_factor}
-			(Max Array Length)`
+			(Max Array Length)`,
 			);
 		}
 		this.cmd(act.step);
@@ -556,138 +638,94 @@ export default class ClosedHash extends Hash {
 		return this.commands;
 	}
 
-	setup() {
-		this.resetIndex = this.nextIndex;
-		this.table_size = CLOSED_HASH_TABLE_SIZE;
-		this.nextLowestPrime = 11;
-		this.load_factor = DEFAULT_LOAD_FACTOR;
-		this.skipDist = new Array(this.table_size);
-		this.hashTableVisual = new Array(this.table_size);
-		this.hashTableValues = new Array(this.table_size);
-		this.size = 0;
-
-		this.indexLabelID = new Array(this.table_size);
-		this.indexXPos = new Array(this.table_size);
-		this.indexYPos = new Array(this.table_size);
-
-		this.empty = new Array(this.table_size);
-		this.deleted = new Array(this.table_size);
-
-		this.ExplainLabel = this.nextIndex++;
-
-		this.HashIndexID = this.nextIndex++;
-
-		// stores deleted index
-		this.DelIndexLabel = this.nextIndex++;
-
-		// stores the load factor
-		this.loadFactorID = this.nextIndex++;
-
-		this.commands = [];
-
-		for (let i = 0; i < this.table_size; i++) {
-			this.skipDist[i] = i; // Start with linear probing
-			this.hashTableVisual[i] = this.nextIndex++;
-			this.empty[i] = true;
-			this.deleted[i] = false;
-
-			const nextXPos = ARRAY_ELEM_START_X + (i % this.elements_per_row) * ARRAY_ELEM_WIDTH;
-			const nextYPos =
-				ARRAY_ELEM_START_Y +
-				Math.floor(i / this.elements_per_row) * ARRAY_VERTICAL_SEPARATION;
-			this.cmd(
-				act.createRectangle,
-				this.hashTableVisual[i],
-				'',
-				ARRAY_ELEM_WIDTH,
-				ARRAY_ELEM_HEIGHT,
-				nextXPos,
-				nextYPos,
-			);
-			this.indexLabelID[i] = this.nextIndex++;
-			this.indexXPos[i] = nextXPos;
-			this.indexYPos[i] = nextYPos + ARRAY_ELEM_HEIGHT;
-
-			this.cmd(act.createLabel, this.indexLabelID[i], i, this.indexXPos[i], this.indexYPos[i]);
-			this.cmd(act.setForegroundColor, this.indexLabelID[i], INDEX_COLOR);
-		}
-		this.cmd(act.createLabel, this.ExplainLabel, '', 10, 40, 0);
-		this.cmd(act.createLabel, this.HashIndexID, '', HASH2_LABEL_X + 300, HASH2_LABEL_Y + 5);
-		this.cmd(act.createLabel, this.DelIndexLabel, '', 10, 60, 0);
-		this.cmd(
-			act.createLabel,
-			this.loadFactorID,
-			`Load Factor: ${this.load_factor}`,
-			LOAD_LABEL_X,
-			LOAD_LABEL_Y
-		);
-		this.animationManager.startNewAnimation(this.commands);
-		this.animationManager.skipForward();
-		this.animationManager.clearHistory();
-	}
-
 	resetAll() {
+		let tmp;
 		this.commands = super.resetAll();
 
 		this.size = 0;
 
-		for (let i = 0; i < this.table_size; i++) {
-			this.empty[i] = true;
-			this.deleted[i] = false;
-			this.hashTableValues[i] = undefined;
-			this.cmd(act.setText, this.hashTableVisual[i], '');
+		for (let i = 0; i < this.hashTableValues.length; i++) {
+			tmp = this.hashTableValues[i];
+			if (tmp != null) {
+				while (tmp != null) {
+					this.cmd(act.delete, tmp.graphicID);
+					tmp = tmp.next;
+				}
+				this.hashTableValues[i] = null;
+				this.cmd(act.setNull, this.hashTableVisual[i], 1);
+			}
 		}
-
 		return this.commands;
-		// Clear array, etc
 	}
 
 	// NEED TO OVERRIDE IN PARENT
 	reset() {
 		this.nextIndex = this.resetIndex;
-		this.table_size = CLOSED_HASH_TABLE_SIZE;
+		this.table_size = HASH_TABLE_SIZE;
 		this.load_factor = DEFAULT_LOAD_FACTOR;
 		this.size = 0;
 
-		this.empty = new Array(this.table_size);
-		this.deleted = new Array(this.table_size);
 		this.hashTableVisual = new Array(this.table_size);
 		this.hashTableValues = new Array(this.table_size);
-		this.indexLabelID = new Array(this.table_size);
+		this.hashTableIndices = new Array(HASH_TABLE_SIZE);
 
-		this.ExplainLabel = this.nextIndex++;
-
-		this.HashIndexID = this.nextIndex++;
-
-		// stores deleted index
-		this.DelIndexLabel = this.nextIndex++;
-
-		// stores the load factor
-		this.loadFactorID = this.nextIndex++;
+		this.indexXPos = new Array(HASH_TABLE_SIZE);
+		this.indexYPos = new Array(HASH_TABLE_SIZE);
 
 		for (let i = 0; i < this.table_size; i++) {
-			this.empty[i] = true;
-			this.deleted[i] = false;
+			this.hashTableValues[i] = null;
 			this.hashTableVisual[i] = this.nextIndex++;
-			this.indexLabelID[i] = this.nextIndex++;
+			this.hashTableIndices[i] = this.nextIndex++;
 		}
 
 		super.reset();
 	}
 
-	resetCallback() {}
+	clear() {
+		this.commands = [];
+
+		for (let i = 0; i < this.hashTableValues.length; i++) {
+			const node = this.hashTableValues[i];
+			if (node != null) {
+				this.cmd(act.delete, node.graphicID);
+			}
+			if (i >= HASH_TABLE_SIZE) {
+				this.cmd(act.delete, this.hashTableVisual[i], 1);
+				this.cmd(act.delete, this.hashTableIndices[i]);
+			} else {
+				this.cmd(act.setNull, this.hashTableVisual[i], 1);
+			}
+		}
+
+		this.hashTableValues = new Array(HASH_TABLE_SIZE);
+		this.size = 0;
+
+		return this.commands;
+	}
+
+	/*this.nextIndex = 0;
+ this.commands = [];
+ this.cmd(act.createLabel, 0, "", 20, 50, 0);
+ this.animationManager.startNewAnimation(this.commands);
+ this.animationManager.skipForward();
+ this.animationManager.clearHistory(); */
 
 	disableUI() {
 		super.disableUI();
-		this.linearProblingButton.disabled = true;
-		this.quadraticProbingButton.disabled = true;
-		this.doubleHashingButton.disabled = true;
 	}
 
 	enableUI() {
 		super.enableUI();
-		this.linearProblingButton.disabled = false;
-		this.quadraticProbingButton.disabled = false;
-		this.doubleHashingButton.disabled = false;
+	}
+}
+
+class LinkedListNode {
+	constructor(key, val, id, initialX, initialY) {
+		this.key = key;
+		this.val = val;
+		this.graphicID = id;
+		this.x = initialX;
+		this.y = initialY;
+		this.next = null;
 	}
 }

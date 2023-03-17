@@ -78,6 +78,31 @@ export function addCheckboxToAlgorithmBar(boxLabel, checked, group) {
 	return element;
 }
 
+export function addDropDownGroupToAlgorithmBar(optionNames, groupName, group) {
+	const dropDown = document.createElement("select");
+	dropDown.name = groupName;
+	for (let i = 0; i < optionNames.length; i++) {
+		const option = document.createElement("option");
+    	option.text = optionNames[i];
+		dropDown.add(option);
+	}
+
+	if (!group) {
+		const tableEntry = document.createElement('td');
+		tableEntry.appendChild(dropDown);
+
+		const controlBar = document.getElementById('AlgorithmSpecificControls');
+		controlBar.appendChild(tableEntry);
+	} else {
+		const span = document.createElement('span');
+		span.appendChild(dropDown);
+
+		group.appendChild(span);
+		span.setAttribute('class', 'groupChild');
+	}
+	return dropDown;
+}
+
 export function addRadioButtonGroupToAlgorithmBar(buttonNames, groupName, group) {
 	const buttonList = [];
 	const newTable = document.createElement('table');
@@ -166,6 +191,10 @@ export function addGroupToAlgorithmBar(horizontal, parentGroup) {
 	return group;
 }
 
+const CODE_LINE_HEIGHT = 14;
+const CODE_HIGHLIGHT_COLOR = '#FF0000';
+const CODE_STANDARD_COLOR = '#000000';
+
 export default class Algorithm {
 	constructor(am, w, h) {
 		if (am == null) {
@@ -184,8 +213,12 @@ export default class Algorithm {
 	}
 
 	addCodeToCanvasBase(code, start_x, start_y, line_height, standard_color, layer) {
+		line_height = typeof line_height !== 'undefined' ? line_height : CODE_LINE_HEIGHT;
+		standard_color =
+			typeof standard_color !== 'undefined' ? standard_color : CODE_STANDARD_COLOR;
 		layer = typeof layer !== 'undefined' ? layer : 0;
 		const codeID = Array(code.length);
+		//console.log(this.nextIndex);
 		let i, j;
 		for (i = 0; i < code.length; i++) {
 			codeID[i] = new Array(code[i].length);
@@ -207,6 +240,22 @@ export default class Algorithm {
 			}
 		}
 		return codeID;
+	}
+
+	highlight(ind1, ind2) {
+		this.cmd(act.setForegroundColor, this.codeID[ind1][ind2], CODE_HIGHLIGHT_COLOR);
+	}
+
+	unhighlight(ind1, ind2) {
+		this.cmd(act.setForegroundColor, this.codeID[ind1][ind2], CODE_STANDARD_COLOR);
+	}
+
+	removeCode(codeID) {
+		for (let i = 0; i < codeID.length; i++) {
+			for (let j = 0; j < codeID[i].length; j++) {
+				this.cmd(act.delete, codeID[i][j]);
+			}
+		}
 	}
 
 	setCodeAlpha(code, newAlpha) {

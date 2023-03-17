@@ -43,6 +43,11 @@ const CHARACTER_VALUES_LABEL_Y = 60;
 const TEXT_HASH_LABEL_START_Y = 100;
 const PATTERN_HASH_LABEL_START_Y = 115;
 
+const COMP_COUNT_X = 575;
+const COMP_COUNT_Y = 30;
+
+const CODE_Y = 180;
+
 export default class RabinKarp extends Algorithm {
 	constructor(am, w, h) {
 		super(am, w, h);
@@ -84,7 +89,8 @@ export default class RabinKarp extends Algorithm {
 		this.controls.push(this.findButton);
 
 		//Base value text field
-		this.baseField = addControlToAlgorithmBar('Base', '');
+		this.baseField = addControlToAlgorithmBar('Text', '');
+		this.baseField.style.textAlign = 'center';
 		this.baseField.onkeydown = this.returnSubmit(
 			this.baseField,
 			this.findCallback.bind(this),
@@ -107,6 +113,7 @@ export default class RabinKarp extends Algorithm {
 	}
 
 	setup() {
+		this.commands = [];
 		this.textRowID = [];
 		this.comparisonMatrixID = [];
 		this.baseLabelID = this.nextIndex++;
@@ -118,7 +125,32 @@ export default class RabinKarp extends Algorithm {
 
 		this.baseValue = 1;
 
-		this.animationManager.startNewAnimation();
+		this.comparisonCountID = this.nextIndex++;
+
+		this.compCount = 0;
+		this.cmd(act.createLabel, this.comparisonCountID, '', COMP_COUNT_X, COMP_COUNT_Y, 0);
+
+		this.code = [
+			['procedure RabinKarp(text, pattern)'],
+			['     m <- length of pattern, n <- length of text'],
+			['     patternHash ← rolling hash of pattern'],
+			['     textHash ← rolling hash of first m characters of text'],
+			['     i <- 0'],
+			['     while i <= n - m'],
+			['          if patternHash = textHash'],
+			['               j <- 0'],
+			['               while j < m and text[i + j] = pattern[j]'],
+			['                    j <- j + 1'],
+			['               if j = m'],
+			['                    match found at i'],
+			['          i <- i + 1'],
+			['          if i <= n - m'],
+			['               textHash <- new hash of text, from i to i + m'],
+			['end procedure'],
+		];
+		this.codeID = [];
+
+		this.animationManager.startNewAnimation(this.commands);
 		this.animationManager.skipForward();
 		this.animationManager.clearHistory();
 	}
@@ -133,6 +165,9 @@ export default class RabinKarp extends Algorithm {
 		this.textHashCalculationID = this.nextIndex++;
 		this.patternHashLabelID = this.nextIndex++;
 		this.patternHashCalculationID = this.nextIndex++;
+		this.comparisonCountID = this.nextIndex++;
+		this.compCount = 0;
+		this.codeID = [];
 	}
 
 	findCallback() {
@@ -152,10 +187,7 @@ export default class RabinKarp extends Algorithm {
 
 	baseCallback() {
 		const val = parseInt(this.baseField.value);
-		if (
-			this.baseField.value !== '' && 
-			val !== 0
-		) {
+		if (this.baseField.value !== '' && val !== 0) {
 			this.baseField.value = '';
 			this.baseValue = val;
 		}
@@ -223,7 +255,14 @@ export default class RabinKarp extends Algorithm {
 		}
 
 		const labelsX = ARRAY_START_X + text.length * this.cellSize + 10;
-		this.cmd(act.createLabel, this.baseLabelID, `Base constant = ${this.baseValue}`, labelsX, BASE_LABEL_Y, 0);
+		this.cmd(
+			act.createLabel,
+			this.baseLabelID,
+			`Base constant = ${this.baseValue}`,
+			labelsX,
+			BASE_LABEL_Y,
+			0,
+		);
 		this.cmd(
 			act.createLabel,
 			this.characterValuesLabelID,
@@ -248,6 +287,10 @@ export default class RabinKarp extends Algorithm {
 			PATTERN_HASH_LABEL_START_Y,
 			0,
 		);
+		this.cmd(act.move, this.comparisonCountID, labelsX, COMP_COUNT_Y);
+		this.cmd(act.setText, this.comparisonCountID, 'Comparison Count: ' + this.compCount);
+
+		this.codeID = this.addCodeToCanvasBase(this.code, labelsX, CODE_Y);
 
 		let textCalculation = '';
 		let textHash = 0;
@@ -256,9 +299,9 @@ export default class RabinKarp extends Algorithm {
 		const base = Math.pow(this.baseValue, pattern.length - 1);
 		let runningBase = base;
 		for (let i = 0; i < pattern.length; i++) {
-			textHash += text.charCodeAt(i) * runningBase - 97;
+			textHash += (text.charCodeAt(i) - 97) * runningBase;
 			textCalculation += `(${text.charAt(i)} * ${runningBase}) + `;
-			patternHash += pattern.charCodeAt(i) * runningBase - 97;
+			patternHash += (pattern.charCodeAt(i) - 97) * runningBase;
 			patternCalculation += `(${pattern.charAt(i)} * ${runningBase}) + `;
 			runningBase /= this.baseValue;
 		}
@@ -287,6 +330,14 @@ export default class RabinKarp extends Algorithm {
 		const iPointerID = this.nextIndex++;
 		const jPointerID = this.nextIndex++;
 
+		this.highlight(2, 0);
+		this.cmd(act.step);
+		this.unhighlight(2, 0);
+		this.highlight(3, 0);
+		this.cmd(act.step);
+		this.unhighlight(3, 0);
+
+		this.highlight(5, 0);
 		let row = 0;
 		for (let i = 0; i <= text.length - pattern.length; i++) {
 			for (let k = i; k < i + pattern.length; k++) {
@@ -299,34 +350,61 @@ export default class RabinKarp extends Algorithm {
 				);
 			}
 			this.cmd(act.step);
+			this.highlight(6, 0);
+			this.cmd(act.step);
 			if (patternHash === textHash) {
+				this.unhighlight(6, 0);
+				this.highlight(7, 0);
 				xpos = i * this.cellSize + ARRAY_START_X;
 				this.cmd(act.createHighlightCircle, iPointerID, '#0000FF', xpos, ARRAY_START_Y);
 				ypos = (row + 1) * this.cellSize + ARRAY_START_Y;
 				this.cmd(act.createHighlightCircle, jPointerID, '#0000FF', xpos, ypos);
 				this.cmd(act.step);
+				this.unhighlight(7, 0);
+				this.highlight(8, 0);
+				this.cmd(act.step);
 				let j = 0;
 				while (j < pattern.length && pattern.charAt(j) === text.charAt(i + j)) {
+					this.cmd(
+						act.setText,
+						this.comparisonCountID,
+						'Comparison Count: ' + ++this.compCount,
+					);
 					this.cmd(
 						act.setBackgroundColor,
 						this.comparisonMatrixID[row][i + j],
 						'#2ECC71',
 					);
 					j++;
+					this.highlight(9, 0);
 					if (j !== pattern.length) {
 						xpos = (i + j) * this.cellSize + ARRAY_START_X;
 						this.cmd(act.move, iPointerID, xpos, ARRAY_START_Y);
 						ypos = (row + 1) * this.cellSize + ARRAY_START_Y;
 						this.cmd(act.move, jPointerID, xpos, ypos);
-						this.cmd(act.step);
 					}
+					this.cmd(act.step);
+					this.unhighlight(9, 0);
 				}
+				this.unhighlight(8, 0);
+				this.highlight(10, 0);
+				this.cmd(act.step);
+				this.unhighlight(10, 0);
 				if (j !== pattern.length) {
+					this.cmd(
+						act.setText,
+						this.comparisonCountID,
+						'Comparison Count: ' + ++this.compCount,
+					);
 					this.cmd(
 						act.setBackgroundColor,
 						this.comparisonMatrixID[row][i + j],
 						'#E74C3C',
 					);
+				} else {
+					this.highlight(11, 0);
+					this.cmd(act.step);
+					this.unhighlight(11, 0);
 				}
 				this.cmd(act.delete, iPointerID);
 				this.cmd(act.delete, jPointerID);
@@ -335,12 +413,19 @@ export default class RabinKarp extends Algorithm {
 				for (let k = i; k < i + pattern.length; k++) {
 					this.cmd(act.setBackgroundColor, this.comparisonMatrixID[row][k], '#FFFF4D');
 				}
+				this.unhighlight(6, 0);
 				this.cmd(act.step);
 			}
+			this.highlight(12, 0);
+			this.cmd(act.step);
+			this.unhighlight(12, 0);
+			this.highlight(13, 0);
+			this.cmd(act.step);
+			this.unhighlight(13, 0);
 			if (i < text.length - pattern.length) {
+				this.highlight(14, 0);
 				textHash =
-					textHash -
-					(base * (text.charCodeAt(i) - 97)) +
+					this.baseValue * (textHash - base * (text.charCodeAt(i) - 97)) +
 					(text.charCodeAt(i + pattern.length) - 97);
 				textCalculation = '';
 				runningBase = base;
@@ -351,9 +436,12 @@ export default class RabinKarp extends Algorithm {
 				textCalculation =
 					textCalculation.substring(0, textCalculation.length - 2) + ' = ' + textHash;
 				this.cmd(act.setText, this.textHashCalculationID, textCalculation);
+				this.cmd(act.step);
+				this.unhighlight(14, 0);
 			}
 			row++;
 		}
+		this.unhighlight(5, 0);
 
 		return this.commands;
 	}
@@ -378,6 +466,10 @@ export default class RabinKarp extends Algorithm {
 			}
 		}
 		this.comparisonMatrixID = [];
+		this.compCount = 0;
+		this.cmd(act.setText, this.comparisonCountID, '');
+		this.removeCode(this.codeID);
+		this.codeID = [];
 
 		return this.commands;
 	}

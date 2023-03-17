@@ -58,7 +58,7 @@ import ObjectManager from './ObjectManager.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import SingleAnimation from './SingleAnimation.js';
-import { Slider } from '@material-ui/core';
+import { Slider } from '@mui/material';
 import { UndoConnect } from './AnimatedLine.js';
 import { saveAs } from 'file-saver'; // Justus
 
@@ -254,6 +254,8 @@ export default class AnimationManager extends EventListener {
 
 		const slider = (
 			<Slider
+				style={{ color: "f9c333", padding: '13px 0', height: 2 }}
+				track
 				defaultValue={speed}
 				onChange={(e, val) => {
 					this.setSpeed(val);

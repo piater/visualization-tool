@@ -30,6 +30,7 @@ import Algorithm, {
 	addGroupToAlgorithmBar,
 	addLabelToAlgorithmBar,
 } from './Algorithm.js';
+import { NUM_HEADS } from './util/SkipListHeads.js';
 import { act } from '../anim/AnimationMain';
 
 const SKIP_LIST_START_X = 100;
@@ -47,6 +48,9 @@ const CF_LABEL_X = 50;
 const CF_LABEL_Y = 37;
 const CF_STRING_X = 120;
 const CF_STRING_Y = 37;
+
+const EXP_LABEL_X = 250;
+const EXP_LABEL_Y = 30;
 
 const NINF = '\u2212\u221E'; // Negative infinity
 const PINF = '\u221E'; // Positive infinity
@@ -79,6 +83,7 @@ export default class SkipList extends Algorithm {
 
 		// Add's value text field
 		this.addValueField = addControlToAlgorithmBar('Text', '', topHorizontalGroup);
+		this.addValueField.style.textAlign = 'center';
 		this.addValueField.setAttribute('placeholder', 'Value');
 		this.addValueField.onkeydown = this.returnSubmit(
 			this.addValueField,
@@ -92,6 +97,7 @@ export default class SkipList extends Algorithm {
 
 		// Heads' text field
 		this.headsField = addControlToAlgorithmBar('Text', '', topHorizontalGroup);
+		this.headsField.style.textAlign = 'center';
 		this.headsField.setAttribute('placeholder', '#');
 		this.headsField.onkeydown = this.returnSubmit(
 			this.headsField,
@@ -101,7 +107,7 @@ export default class SkipList extends Algorithm {
 		);
 		this.controls.push(this.headsField);
 
-		addLabelToAlgorithmBar('heads', topHorizontalGroup);
+		addLabelToAlgorithmBar('heads (Max 4)', topHorizontalGroup);
 
 		// Add with heads button
 		this.addWithHeadsButton = addControlToAlgorithmBar('Button', 'Add', bottomHorizontalGroup);
@@ -113,6 +119,7 @@ export default class SkipList extends Algorithm {
 
 		// Add's value text field
 		this.addValueFieldRandom = addControlToAlgorithmBar('Text', '', topHorizontalGroupRandom);
+		this.addValueFieldRandom.style.textAlign = 'center';
 		this.addValueFieldRandom.setAttribute('placeholder', 'Value');
 		this.addValueFieldRandom.onkeydown = this.returnSubmit(
 			this.addValueFieldRandom,
@@ -137,6 +144,7 @@ export default class SkipList extends Algorithm {
 
 		// Remove's text field
 		this.removeField = addControlToAlgorithmBar('Text', '');
+		this.removeField.style.textAlign = 'center';
 		this.removeField.onkeydown = this.returnSubmit(
 			this.removeField,
 			this.removeCallback.bind(this),
@@ -154,6 +162,7 @@ export default class SkipList extends Algorithm {
 
 		// Get's index text field
 		this.getField = addControlToAlgorithmBar('Text', '');
+		this.getField.style.textAlign = 'center';
 		this.getField.onkeydown = this.returnSubmit(
 			this.getField,
 			this.getCallback.bind(this),
@@ -194,6 +203,9 @@ export default class SkipList extends Algorithm {
 		this.data = [[Number.NEGATIVE_INFINITY], [Number.POSITIVE_INFINITY]];
 		this.size = 0;
 
+		this.seed = Math.floor(Math.random() * 100) % NUM_HEADS.length;
+		this.seedStart = this.seed;
+
 		this.cmd(
 			act.createSkipListNode,
 			this.nodeID[0][0],
@@ -224,6 +236,7 @@ export default class SkipList extends Algorithm {
 		this.nodeID = [[this.nextIndex++], [this.nextIndex++]];
 		this.data = [[Number.NEGATIVE_INFINITY], [Number.POSITIVE_INFINITY]];
 		this.size = 0;
+		this.seed = this.seedStart;
 	}
 
 	addRandomlyCallback() {
@@ -269,7 +282,7 @@ export default class SkipList extends Algorithm {
 		this.commands = [];
 
 		if (heads === undefined) {
-			heads = Math.floor(Math.random() * (this.size + 1));
+			heads = NUM_HEADS[this.seed++ % NUM_HEADS.length]; // random int between [0, 4]
 		}
 		heads = Math.min(heads, 4);
 
@@ -278,6 +291,7 @@ export default class SkipList extends Algorithm {
 
 		const cfLabelId = this.nextIndex++;
 		const cfStringId = this.nextIndex++;
+		const expLabelID = this.nextIndex++;
 
 		let headsString = '';
 		for (let i = 0; i < heads; i++) {
@@ -289,6 +303,7 @@ export default class SkipList extends Algorithm {
 		this.cmd(act.createLabel, valueStringId, value, VALUE_STRING_X, VALUE_STRING_Y);
 		this.cmd(act.createLabel, cfLabelId, 'Coin Flipper:', CF_LABEL_X, CF_LABEL_Y);
 		this.cmd(act.createLabel, cfStringId, headsString, CF_STRING_X, CF_STRING_Y);
+		this.cmd(act.createLabel, expLabelID, '', EXP_LABEL_X, EXP_LABEL_Y);
 		this.cmd(act.step);
 
 		// Add levels
@@ -338,13 +353,16 @@ export default class SkipList extends Algorithm {
 			newCol++;
 		}
 
-		// Move IDs and data in next columns to the right
-		for (let col = this.nodeID.length - 1; col >= newCol; col--) {
-			this.nodeID[col + 1] = this.nodeID[col];
-			this.data[col + 1] = this.data[col];
+		//this step should be skipped in the case of a duplicate
+		if (value !== this.data[newCol][0]) {
+			// Move IDs and data in next columns to the right
+			for (let col = this.nodeID.length - 1; col >= newCol; col--) {
+				this.nodeID[col + 1] = this.nodeID[col];
+				this.data[col + 1] = this.data[col];
+			}
+			this.nodeID[newCol] = [];
+			this.data[newCol] = [];
 		}
-		this.nodeID[newCol] = [];
-		this.data[newCol] = [];
 
 		// Traverse and add
 		let col = 0;
@@ -366,6 +384,7 @@ export default class SkipList extends Algorithm {
 			// Move right until next element is greater or equal
 			let nextCol = this.getNextCol(col, row);
 			if (value === this.data[nextCol][row]) {
+				col = nextCol;
 				foundDuplicate = true;
 				break;
 			}
@@ -379,6 +398,12 @@ export default class SkipList extends Algorithm {
 				this.cmd(act.step);
 				col = nextCol;
 				nextCol = this.getNextCol(col, row);
+			}
+
+			if (value === this.data[nextCol][row]) {
+				col = nextCol;
+				foundDuplicate = true;
+				break;
 			}
 
 			// Move highlight circle downward
@@ -397,57 +422,59 @@ export default class SkipList extends Algorithm {
 		// Add nodes bottom-up to the new column if no duplicate has been found
 		if (!foundDuplicate) {
 			this.shiftColumns(newCol);
-			row++;
-			// Having a highlight circle in the previous ID causes an object to look weird (this
-			// seems to be an already existing bug) Creating a random object before it is a workaround
-			this.cmd(act.createCircle, this.nextIndex++, '', -100, -100, 0);
+		} else {
+			this.cmd(
+				act.move,
+				highlightID,
+				SKIP_LIST_START_X + SKIP_LIST_SPACING * col,
+				SKIP_LIST_START_Y - SKIP_LIST_SPACING * row,
+			);
+			this.cmd(act.step);
+			this.cmd(act.setText, expLabelID, 'Duplicate found!');
+			this.cmd(act.step);
+		}
+		row++;
+		// Having a highlight circle in the previous ID causes an object to look weird (this
+		// seems to be an already existing bug) Creating a random object before it is a workaround
+		this.cmd(act.createCircle, this.nextIndex++, '', -100, -100, 0);
 
-			while (row <= heads) {
-				this.data[newCol][row] = value;
-				this.nodeID[newCol][row] = this.nextIndex++;
-				this.cmd(
-					act.createSkipListNode,
-					this.nodeID[newCol][row],
-					value,
-					SKIP_LIST_ELEM_SIZE,
-					SKIP_LIST_ELEM_SIZE,
-					SKIP_LIST_START_X + SKIP_LIST_SPACING * newCol,
-					SKIP_LIST_START_Y - SKIP_LIST_SPACING * row,
-				);
-				const prevCol = this.getPrevCol(newCol, row);
-				const nextCol = this.getNextCol(newCol, row);
-				this.cmd(act.disconnect, this.nodeID[prevCol][row], this.nodeID[nextCol][row]);
+		while (row <= heads) {
+			this.cmd(act.setText, expLabelID, 'Adding data');
+			this.cmd(act.step);
+			this.data[newCol][row] = value;
+			this.nodeID[newCol][row] = this.nextIndex++;
+			this.cmd(
+				act.createSkipListNode,
+				this.nodeID[newCol][row],
+				value,
+				SKIP_LIST_ELEM_SIZE,
+				SKIP_LIST_ELEM_SIZE,
+				SKIP_LIST_START_X + SKIP_LIST_SPACING * newCol,
+				SKIP_LIST_START_Y - SKIP_LIST_SPACING * row,
+			);
+			const prevCol = this.getPrevCol(newCol, row);
+			const nextCol = this.getNextCol(newCol, row);
+			this.cmd(act.disconnect, this.nodeID[prevCol][row], this.nodeID[nextCol][row]);
+			this.cmd(act.connectSkipList, this.nodeID[prevCol][row], this.nodeID[newCol][row], 3);
+			this.cmd(act.connectSkipList, this.nodeID[newCol][row], this.nodeID[nextCol][row], 3);
+			if (row !== 0) {
 				this.cmd(
 					act.connectSkipList,
-					this.nodeID[prevCol][row],
+					this.nodeID[newCol][row - 1],
 					this.nodeID[newCol][row],
-					3,
+					0,
 				);
-				this.cmd(
-					act.connectSkipList,
-					this.nodeID[newCol][row],
-					this.nodeID[nextCol][row],
-					3,
-				);
-				if (row !== 0) {
-					this.cmd(
-						act.connectSkipList,
-						this.nodeID[newCol][row - 1],
-						this.nodeID[newCol][row],
-						0,
-					);
-				}
-				this.cmd(act.step);
-
-				this.cmd(
-					act.move,
-					highlightID,
-					SKIP_LIST_START_X + SKIP_LIST_SPACING * newCol,
-					SKIP_LIST_START_Y - SKIP_LIST_SPACING * row,
-				);
-				this.cmd(act.step);
-				row++;
 			}
+			this.cmd(act.step);
+
+			this.cmd(
+				act.move,
+				highlightID,
+				SKIP_LIST_START_X + SKIP_LIST_SPACING * newCol,
+				SKIP_LIST_START_Y - SKIP_LIST_SPACING * row,
+			);
+			this.cmd(act.step);
+			row++;
 		}
 
 		this.cmd(act.delete, valueLabelId);
@@ -455,6 +482,7 @@ export default class SkipList extends Algorithm {
 		this.cmd(act.delete, cfLabelId);
 		this.cmd(act.delete, cfStringId);
 		this.cmd(act.delete, highlightID);
+		this.cmd(act.delete, expLabelID);
 
 		this.size++;
 

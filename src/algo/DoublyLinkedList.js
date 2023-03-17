@@ -49,6 +49,17 @@ const PUSH_LABEL_Y = 30;
 const PUSH_ELEMENT_X = 240;
 const PUSH_ELEMENT_Y = 30;
 
+const HEAD_POS_X = 180;
+const HEAD_POS_Y = 100;
+
+const TAIL_POS_X = 180;
+
+const POINTER_LABEL_X = 130;
+const HEAD_LABEL_Y = 100;
+
+const POINTER_ELEM_WIDTH = 30;
+const POINTER_ELEM_HEIGHT = 30;
+
 const SIZE = 32;
 
 export default class DoublyLinkedList extends Algorithm {
@@ -56,6 +67,9 @@ export default class DoublyLinkedList extends Algorithm {
 		super(am, w, h);
 		this.addControls();
 		this.nextIndex = 0;
+		this.commands = [];
+		this.tail_pos_y = h - LINKED_LIST_ELEM_HEIGHT;
+		this.tail_label_y = this.tail_pos_y;
 		this.setup();
 		this.initialIndex = this.nextIndex;
 	}
@@ -71,6 +85,7 @@ export default class DoublyLinkedList extends Algorithm {
 
 		// Add's value text field
 		this.addValueField = addControlToAlgorithmBar('Text', '', addTopHorizontalGroup);
+		this.addValueField.style.textAlign = 'center';
 		this.addValueField.onkeydown = this.returnSubmit(
 			this.addValueField,
 			() => this.addIndexCallback(),
@@ -83,6 +98,7 @@ export default class DoublyLinkedList extends Algorithm {
 
 		// Add's index text field
 		this.addIndexField = addControlToAlgorithmBar('Text', '', addTopHorizontalGroup);
+		this.addIndexField.style.textAlign = 'center';
 		this.addIndexField.onkeydown = this.returnSubmit(
 			this.addIndexField,
 			() => this.addIndexCallback(),
@@ -130,6 +146,7 @@ export default class DoublyLinkedList extends Algorithm {
 
 		// Remove's index text field
 		this.removeField = addControlToAlgorithmBar('Text', '', removeTopHorizontalGroup);
+		this.removeField.style.textAlign = 'center';
 		this.removeField.onkeydown = this.returnSubmit(
 			this.removeField,
 			() => this.removeIndexCallback(),
@@ -200,9 +217,40 @@ export default class DoublyLinkedList extends Algorithm {
 	setup() {
 		this.linkedListElemID = new Array(SIZE);
 
+		this.headID = this.nextIndex++;
+		this.headLabelID = this.nextIndex++;
+
+		this.tailID = this.nextIndex++;
+		this.tailLabelID = this.nextIndex++;
+
 		this.arrayData = new Array(SIZE);
 		this.size = 0;
 		this.leftoverLabelID = this.nextIndex++;
+
+		this.cmd(act.createLabel, this.headLabelID, 'Head', POINTER_LABEL_X, HEAD_LABEL_Y);
+		this.cmd(
+			act.createRectangle,
+			this.headID,
+			'',
+			POINTER_ELEM_WIDTH,
+			POINTER_ELEM_HEIGHT,
+			HEAD_POS_X,
+			HEAD_POS_Y,
+		);
+
+		this.cmd(act.createLabel, this.tailLabelID, 'Tail', POINTER_LABEL_X, this.tail_label_y);
+		this.cmd(
+			act.createRectangle,
+			this.tailID,
+			'',
+			POINTER_ELEM_WIDTH,
+			POINTER_ELEM_HEIGHT,
+			TAIL_POS_X,
+			this.tail_pos_y,
+		);
+
+		this.cmd(act.setNull, this.headID, 1);
+		this.cmd(act.setNull, this.tailID, 1);
 
 		this.cmd(act.createLabel, this.leftoverLabelID, '', PUSH_LABEL_X, PUSH_LABEL_Y);
 
@@ -278,11 +326,39 @@ export default class DoublyLinkedList extends Algorithm {
 		this.implementAction(this.clearAll.bind(this));
 	}
 
+	traverse(index) {
+		if (index < Math.floor(this.size / 2)) {
+			for (let i = 0; i <= index; i++) {
+				this.cmd(act.step);
+				this.cmd(act.setHighlight, this.linkedListElemID[i], 1);
+				if (i > 0) {
+					this.cmd(act.setHighlight, this.linkedListElemID[i - 1], 0);
+				}
+			}
+			this.cmd(act.step);
+		} else {
+			for (let i = this.size - 1; i >= index; i--) {
+				this.cmd(act.step);
+				this.cmd(act.setHighlight, this.linkedListElemID[i], 1);
+				if (i < this.size) {
+					this.cmd(act.setHighlight, this.linkedListElemID[i + 1], 0);
+				}
+			}
+			this.cmd(act.step);
+		}
+	}
+
 	add(elemToAdd, index) {
 		this.commands = [];
 
 		const labPushID = this.nextIndex++;
 		const labPushValID = this.nextIndex++;
+
+		// iterate to the correct node if it is an index != 0 or size
+		const indexToTraverseTo = index < Math.floor(this.size / 2) ? index - 1 : index;
+		if (index > 0 && index < this.size) {
+			this.traverse(indexToTraverseTo);
+		}
 
 		for (let i = this.size - 1; i >= index; i--) {
 			this.arrayData[i + 1] = this.arrayData[i];
@@ -316,10 +392,12 @@ export default class DoublyLinkedList extends Algorithm {
 
 		if (index === 0) {
 			this.cmd(act.setPrevNull, this.linkedListElemID[index], 1);
+			this.cmd(act.connect, this.headID, this.linkedListElemID[index]);
 		}
 
 		if (index === this.size) {
 			this.cmd(act.setNextNull, this.linkedListElemID[index], 1);
+			this.cmd(act.connect, this.tailID, this.linkedListElemID[index]);
 		}
 
 		if (this.size !== 0) {
@@ -335,6 +413,7 @@ export default class DoublyLinkedList extends Algorithm {
 					this.linkedListElemID[index + 1],
 					this.linkedListElemID[index],
 				);
+				this.cmd(act.disconnect, this.headID, this.linkedListElemID[index + 1]);
 			} else if (index === this.size) {
 				this.cmd(act.setNextNull, this.linkedListElemID[index - 1], 0);
 				this.cmd(
@@ -347,6 +426,7 @@ export default class DoublyLinkedList extends Algorithm {
 					this.linkedListElemID[index],
 					this.linkedListElemID[index - 1],
 				);
+				this.cmd(act.disconnect, this.tailID, this.linkedListElemID[index - 1]);
 			} else {
 				this.cmd(
 					act.disconnect,
@@ -381,6 +461,14 @@ export default class DoublyLinkedList extends Algorithm {
 			}
 		}
 
+		this.cmd(
+			act.setHighlight,
+			this.linkedListElemID[
+				index < Math.floor(this.size / 2) ? indexToTraverseTo : indexToTraverseTo + 1
+			],
+			0,
+		);
+
 		this.cmd(act.step);
 		this.size = this.size + 1;
 		this.resetNodePositions();
@@ -399,6 +487,10 @@ export default class DoublyLinkedList extends Algorithm {
 
 		this.cmd(act.setText, this.leftoverLabelID, '');
 
+		if (index > 0 && index < this.size - 1) {
+			this.traverse(index);
+		}
+
 		const nodePosX = LINKED_LIST_START_X + LINKED_LIST_ELEM_SPACING * index;
 		const nodePosY = LINKED_LIST_START_Y;
 		this.cmd(act.createLabel, labPopID, 'Removing Value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
@@ -414,6 +506,8 @@ export default class DoublyLinkedList extends Algorithm {
 					this.linkedListElemID[index],
 				);
 				this.cmd(act.setPrevNull, this.linkedListElemID[index + 1], 1);
+				this.cmd(act.disconnect, this.headID, this.linkedListElemID[index]);
+				this.cmd(act.connect, this.headID, this.linkedListElemID[index + 1]);
 			} else if (index === this.size - 1) {
 				this.cmd(
 					act.disconnect,
@@ -421,6 +515,8 @@ export default class DoublyLinkedList extends Algorithm {
 					this.linkedListElemID[index],
 				);
 				this.cmd(act.setNextNull, this.linkedListElemID[index - 1], 1);
+				this.cmd(act.disconnect, this.tailID, this.linkedListElemID[index]);
+				this.cmd(act.connect, this.tailID, this.linkedListElemID[index - 1]);
 			} else {
 				const xPos =
 					(index % LINKED_LIST_ELEMS_PER_LINE) * LINKED_LIST_ELEM_SPACING +
@@ -449,6 +545,9 @@ export default class DoublyLinkedList extends Algorithm {
 					this.linkedListElemID[index - 1],
 				);
 			}
+		} else {
+			this.cmd(act.disconnect, this.headID, this.linkedListElemID[index]);
+			this.cmd(act.disconnect, this.tailID, this.linkedListElemID[index]);
 		}
 		this.cmd(act.step);
 		this.cmd(act.delete, this.linkedListElemID[index]);
@@ -483,6 +582,8 @@ export default class DoublyLinkedList extends Algorithm {
 			this.cmd(act.delete, this.linkedListElemID[i]);
 		}
 		this.size = 0;
+		this.cmd(act.setNull, this.headID, 1);
+		this.cmd(act.setNull, this.tailID, 1);
 		return this.commands;
 	}
 }
