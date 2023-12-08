@@ -44,10 +44,15 @@ const LINKED_LIST_ELEMS_PER_LINE = 8;
 const LINKED_LIST_ELEM_SPACING = 150;
 const LINKED_LIST_LINE_SPACING = 100;
 
-const PUSH_LABEL_X = 120;
+const PUSH_LABEL_X = 100;	// Justus
+const PUSH_INDEX_LABEL_X = 280;	// Justus
 const PUSH_LABEL_Y = 30;
-const PUSH_ELEMENT_X = 240;
+const PUSH_ELEMENT_X = 200;	// Justus
+const PUSH_INDEX_ELEMENT_X = 335; // Justus
 const PUSH_ELEMENT_Y = 30;
+const POP_ELEMENT_X = 210;	 // Justus
+const POP_INDEX_LABEL_X = 300;	 // Justus
+const POP_INDEX_ELEMENT_X = 370; // Justus
 
 const HEAD_POS_X = 180;
 const HEAD_POS_Y = 100;
@@ -353,6 +358,8 @@ export default class DoublyLinkedList extends Algorithm {
 
 		const labPushID = this.nextIndex++;
 		const labPushValID = this.nextIndex++;
+		const labPushIndexID = this.nextIndex++;
+		const labPushIndexValID = this.nextIndex++;
 
 		// iterate to the correct node if it is an index != 0 or size
 		const indexToTraverseTo = index < Math.floor(this.size / 2) ? index - 1 : index;
@@ -379,8 +386,10 @@ export default class DoublyLinkedList extends Algorithm {
 			LINKED_LIST_INSERT_Y,
 		);
 
-		this.cmd(act.createLabel, labPushID, 'Adding Value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
+		this.cmd(act.createLabel, labPushID, 'adding value ', PUSH_LABEL_X, PUSH_LABEL_Y);
 		this.cmd(act.createLabel, labPushValID, elemToAdd, PUSH_ELEMENT_X, PUSH_ELEMENT_Y);
+		this.cmd(act.createLabel, labPushIndexID, 'at rank ', PUSH_INDEX_LABEL_X, PUSH_LABEL_Y);
+		this.cmd(act.createLabel, labPushIndexValID, index, PUSH_INDEX_ELEMENT_X, PUSH_ELEMENT_Y);
 
 		this.cmd(act.step);
 
@@ -473,6 +482,8 @@ export default class DoublyLinkedList extends Algorithm {
 		this.size = this.size + 1;
 		this.resetNodePositions();
 		this.cmd(act.delete, labPushID);
+		this.cmd(act.delete, labPushIndexID);
+		this.cmd(act.delete, labPushIndexValID);
 		this.cmd(act.step);
 
 		return this.commands;
@@ -484,6 +495,8 @@ export default class DoublyLinkedList extends Algorithm {
 		index = parseInt(index);
 		const labPopID = this.nextIndex++;
 		const labPopValID = this.nextIndex++;
+		const labPopIndexID = this.nextIndex++;
+		const labPopIndexValID = this.nextIndex++;
 
 		this.cmd(act.setText, this.leftoverLabelID, '');
 
@@ -493,9 +506,11 @@ export default class DoublyLinkedList extends Algorithm {
 
 		const nodePosX = LINKED_LIST_START_X + LINKED_LIST_ELEM_SPACING * index;
 		const nodePosY = LINKED_LIST_START_Y;
-		this.cmd(act.createLabel, labPopID, 'Removing Value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
+		this.cmd(act.createLabel, labPopID, 'removing value ', PUSH_LABEL_X, PUSH_LABEL_Y);
 		this.cmd(act.createLabel, labPopValID, this.arrayData[index], nodePosX, nodePosY);
-		this.cmd(act.move, labPopValID, PUSH_ELEMENT_X, PUSH_ELEMENT_Y);
+		this.cmd(act.createLabel, labPopIndexID, 'from rank ', POP_INDEX_LABEL_X, PUSH_LABEL_Y);
+		this.cmd(act.createLabel, labPopIndexValID, index, POP_INDEX_ELEMENT_X, PUSH_LABEL_Y);
+		this.cmd(act.move, labPopValID, POP_ELEMENT_X, PUSH_ELEMENT_Y);
 		this.cmd(act.step);
 
 		if (this.size !== 1) {
@@ -561,6 +576,8 @@ export default class DoublyLinkedList extends Algorithm {
 
 		this.cmd(act.delete, labPopValID);
 		this.cmd(act.delete, labPopID);
+		this.cmd(act.delete, labPopIndexValID);
+		this.cmd(act.delete, labPopIndexID);
 
 		return this.commands;
 	}
