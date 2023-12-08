@@ -24,6 +24,8 @@
 // authors and should not be interpreted as representing official policies, either expressed
 // or implied, of the University of San Francisco
 
+import '../jpcolors.js';
+
 import Algorithm, { addControlToAlgorithmBar, addLabelToAlgorithmBar } from './Algorithm.js';
 import { act } from '../anim/AnimationMain';
 
@@ -43,7 +45,7 @@ const CODE_START_X = 20;
 const CODE_START_Y = 50;
 const CODE_LINE_HEIGHT = 30;
 
-const CODE_HIGHLIGHT_COLOR = '#FF8000';
+const CODE_HIGHLIGHT_COLOR = global.jpc_highlight;
 const CODE_STANDARD_COLOR = '#000000';
 const LCS_CELL_COLOR = '#E3F0FF';
 const MAX_SEQUENCE_LENGTH = 13;
@@ -151,8 +153,7 @@ export default class LCS extends Algorithm {
 		}
 	}
 
-	run(str1, str2) {
-		this.commands = [];
+	fillTable(str1, str2) {
 		this.clearOldIDs();
 
 		this.buildTable(str1, str2);
@@ -317,16 +318,25 @@ export default class LCS extends Algorithm {
 		this.cmd(act.setText, this.infoLabelID, 'Finished building table, can now find LCS');
 		}
 		this.cmd(act.step);
+	}
 
-		this.buildLCSFromTable(str1, str2);
+	run(str1, str2) {
+		this.commands = [];
 
-		this.unhighlight(24, 0);
-		this.highlight(25, 0);
-		if (SHOW_INFO) {
-		this.cmd(act.setText, this.infoLabelID, 'Done');
+		if (this.tableID === undefined) {
+			this.fillTable(str1, str2);
 		}
-		this.cmd(act.step);
-		this.unhighlight(25, 0);
+		else {
+			this.buildLCSFromTable(str1, str2);
+
+			this.unhighlight(24, 0);
+			this.highlight(25, 0);
+			if (SHOW_INFO) {
+				this.cmd(act.setText, this.infoLabelID, 'Done');
+			}
+			this.cmd(act.step);
+			this.unhighlight(25, 0);
+		}
 
 		return this.commands;
 	}
@@ -437,7 +447,7 @@ export default class LCS extends Algorithm {
 		this.cmd(
 			act.createLabel,
 			header,
-			'Längste gemeinsame Untersequenz:',
+			'Longest Common Subsequence:',
 			SEQUENCE_START_X,
 			SEQUENCE_START_Y - 40,
 			0,
@@ -584,11 +594,15 @@ export default class LCS extends Algorithm {
 	}
 
 	highlight(ind1, ind2) {
-		this.cmd(act.setForegroundColor, this.codeID[ind1][ind2], CODE_HIGHLIGHT_COLOR);
+		if (SHOW_ALGO) {
+			this.cmd(act.setForegroundColor, this.codeID[ind1][ind2], CODE_HIGHLIGHT_COLOR);
+		}
 	}
 
 	unhighlight(ind1, ind2) {
-		this.cmd(act.setForegroundColor, this.codeID[ind1][ind2], CODE_STANDARD_COLOR);
+		if (SHOW_ALGO) {
+			this.cmd(act.setForegroundColor, this.codeID[ind1][ind2], CODE_STANDARD_COLOR);
+		}
 	}
 
 	enableUI() {
