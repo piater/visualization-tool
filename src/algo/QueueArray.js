@@ -28,7 +28,7 @@ import Algorithm, { addControlToAlgorithmBar, addDivisorToAlgorithmBar } from '.
 import { act } from '../anim/AnimationMain';
 
 const ARRAY_START_X = 100;
-const ARRAY_START_Y = 200;
+const ARRAY_START_Y = 250;
 const ARRAY_ELEM_WIDTH = 50;
 const ARRAY_ELEM_HEIGHT = 50;
 
@@ -36,27 +36,27 @@ const ARRAY_ELEMS_PER_LINE = 14;
 const ARRAY_LINE_SPACING = 130;
 
 const FRONT_POS_X = 180;
-const FRONT_POS_Y = 100;
+const FRONT_POS_Y = 150;
 const FRONT_LABEL_X = 110;
-const FRONT_LABEL_Y = 100;
+const FRONT_LABEL_Y = 150;
 
 const SIZE_POS_X = 330;
-const SIZE_POS_Y = 100;
+const SIZE_POS_Y = 150;
 const SIZE_LABEL_X = 270;
-const SIZE_LABEL_Y = 100;
+const SIZE_LABEL_Y = 150;
 
 const QUEUE_LABEL_X = 120;
-const QUEUE_LABEL_Y = 20;
+const QUEUE_LABEL_Y = 30;
 const QUEUE_ELEMENT_X = 240;
-const QUEUE_ELEMENT_Y = 20;
+const QUEUE_ELEMENT_Y = 30;
 
-const QUEUE_INDEX_X = 280;
-const QUEUE_INDEX_Y = 50;
-const QUEUE_INDEXVAL_X = 560;
-const QUEUE_INDEXVAL_Y = 50;
+const QUEUE_INDEX_X = 210;
+const QUEUE_INDEX_Y = 70;
+const QUEUE_INDEXVAL_X = 425;
+const QUEUE_INDEXVAL_Y = 70;
 
 const RESIZE_ARRAY_START_X = 100;
-const RESIZE_ARRAY_START_Y = 300;
+const RESIZE_ARRAY_START_Y = 350;
 const QUEUE_RESIZE_LABEL_X = 60;
 const QUEUE_RESIZE_LABEL_Y = 60;
 
@@ -153,7 +153,7 @@ export default class QueueArray extends Algorithm {
 			this.cmd(act.createLabel, this.arrayLabelID[i], i, xpos, ypos + ARRAY_ELEM_HEIGHT);
 			this.cmd(act.setForegroundColor, this.arrayLabelID[i], INDEX_COLOR);
 		}
-		this.cmd(act.createLabel, frontLabelID, 'Front', FRONT_LABEL_X, FRONT_LABEL_Y);
+		this.cmd(act.createLabel, frontLabelID, 'front', FRONT_LABEL_X, FRONT_LABEL_Y);
 		this.cmd(
 			act.createRectangle,
 			this.frontID,
@@ -164,7 +164,7 @@ export default class QueueArray extends Algorithm {
 			FRONT_POS_Y,
 		);
 
-		this.cmd(act.createLabel, sizeLabelID, 'Size', SIZE_LABEL_X, SIZE_LABEL_Y);
+		this.cmd(act.createLabel, sizeLabelID, 'size', SIZE_LABEL_X, SIZE_LABEL_Y);
 		this.cmd(
 			act.createRectangle,
 			this.sizeID,
@@ -178,12 +178,12 @@ export default class QueueArray extends Algorithm {
 		this.cmd(
 			act.createLabel,
 			this.frontPointerID,
-			'Front',
+			'front',
 			ARRAY_START_X,
 			ARRAY_START_Y + FRONT_LABEL_OFFSET,
 		);
 
-		this.cmd(act.createLabel, this.leftoverLabelID, '', QUEUE_LABEL_X, QUEUE_LABEL_Y);
+		this.cmd(act.createLabel, this.leftoverLabelID, '', QUEUE_LABEL_X + global.jpleftoveroff, QUEUE_LABEL_Y);
 
 		this.highlight1ID = this.nextIndex++;
 
@@ -248,12 +248,12 @@ export default class QueueArray extends Algorithm {
 		this.arrayData[newTail] = elemToEnqueue;
 		this.cmd(act.setText, this.leftoverLabelID, '');
 
-		this.cmd(act.createLabel, labEnqueueID, 'Enqueuing Value: ', QUEUE_LABEL_X, QUEUE_LABEL_Y);
+		this.cmd(act.createLabel, labEnqueueID, 'enqueuing value: ', QUEUE_LABEL_X, QUEUE_LABEL_Y);
 		this.cmd(act.createLabel, labEnqueueValID, elemToEnqueue, QUEUE_ELEMENT_X, QUEUE_ELEMENT_Y);
 		this.cmd(
 			act.createLabel,
 			labIndexID,
-			'Enqueueing at (front + size) % array.length: ',
+			'enqueuing at (front + size) % N: ',
 			QUEUE_INDEX_X,
 			QUEUE_INDEX_Y,
 		);
@@ -306,7 +306,7 @@ export default class QueueArray extends Algorithm {
 
 		this.cmd(act.setText, this.leftoverLabelID, '');
 
-		this.cmd(act.createLabel, labDequeueID, 'Dequeued Value: ', QUEUE_LABEL_X, QUEUE_LABEL_Y);
+		this.cmd(act.createLabel, labDequeueID, 'dequeued value: ', QUEUE_LABEL_X, QUEUE_LABEL_Y);
 
 		this.cmd(
 			act.createHighlightCircle,
@@ -349,7 +349,7 @@ export default class QueueArray extends Algorithm {
 		this.cmd(act.setHighlight, this.frontID, 0);
 		this.cmd(act.setHighlight, this.frontPointerID, 0);
 
-		this.cmd(act.setText, this.leftoverLabelID, 'Dequeued Value: ' + dequeuedVal);
+		this.cmd(act.setText, this.leftoverLabelID, 'dequeued value: ' + dequeuedVal);
 
 		this.cmd(act.delete, labDequeueID);
 		this.cmd(act.delete, labDequeueValID);
@@ -390,7 +390,7 @@ export default class QueueArray extends Algorithm {
 
 		this.arrayDataNew[this.size] = elemToEnqueue;
 
-		this.cmd(act.createLabel, labEnqueueID, 'Enqueuing Value: ', QUEUE_LABEL_X, QUEUE_LABEL_Y);
+		this.cmd(act.createLabel, labEnqueueID, 'enqueuing value: ', QUEUE_LABEL_X, QUEUE_LABEL_Y);
 		this.cmd(act.createLabel, labEnqueueValID, elemToEnqueue, QUEUE_ELEMENT_X, QUEUE_ELEMENT_Y);
 		this.cmd(
 			act.createLabel,
@@ -513,7 +513,7 @@ export default class QueueArray extends Algorithm {
 		this.cmd(
 			act.createLabel,
 			labIndexID,
-			'Enqueueing at (front + size) % array.length: ',
+			'enqueuing at (front + size) % N: ',
 			QUEUE_INDEX_X,
 			QUEUE_INDEX_Y,
 		);

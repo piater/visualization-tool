@@ -29,7 +29,7 @@ import { act } from '../anim/AnimationMain';
 
 const POINTER_ARRAY_ELEM_WIDTH = 90;	// Justus: 90; for abcdefghi: 130
 const POINTER_ARRAY_ELEM_HEIGHT = 40;
-const POINTER_ARRAY_ELEM_START_X = 70;
+const POINTER_ARRAY_ELEM_START_X = 120;
 const POINTER_ARRAY_ELEM_START_Y = 200;
 
 const RESIZE_POINTER_ARRAY_ELEM_START_X = 670;
@@ -38,15 +38,15 @@ const RESIZE_LABEL_X = 800;
 const RESIZE_LABEL_Y = 20;
 
 const LINKED_ITEM_WIDTH = 110;
-const LINKED_ITEM_HEIGHT = 20;
+const LINKED_ITEM_HEIGHT = 30;
 
-const LINKED_ITEM_INITIAL_X = 60;
-const LINKED_ITEM_INITIAL_Y = 40;
-const LINKED_ITEM_X_DELTA_INIT = 85;
-const LINKED_ITEM_X_DELTA = 100;
+const LINKED_ITEM_INITIAL_X = 220;
+const LINKED_ITEM_INITIAL_Y = 150;
+const LINKED_ITEM_X_DELTA_INIT = 120;
+const LINKED_ITEM_X_DELTA = 150;
 
-const EXPLAIN_LABEL_X = 550;
-const EXPLAIN_LABEL_Y = 15;
+const EXPLAIN_LABEL_X = 10;
+const EXPLAIN_LABEL_Y = 20;
 
 const HASH_TABLE_SIZE = 7;
 
@@ -112,7 +112,7 @@ export default class ClosedHash extends Hash {
 			this.hashTableIndices[i] = nextID;
 			this.hashTableValues[i] = null;
 
-			this.indexXPos[i] = POINTER_ARRAY_ELEM_START_X - POINTER_ARRAY_ELEM_WIDTH;
+			this.indexXPos[i] = POINTER_ARRAY_ELEM_START_X - POINTER_ARRAY_ELEM_WIDTH + 10;
 			this.indexYPos[i] = POINTER_ARRAY_ELEM_START_Y + i * POINTER_ARRAY_ELEM_HEIGHT;
 
 			this.cmd(act.createLabel, nextID, i, this.indexXPos[i], this.indexYPos[i]);
@@ -121,7 +121,7 @@ export default class ClosedHash extends Hash {
 		this.cmd(
 			act.createLabel,
 			this.loadFactorID,
-			`Load Factor: ${this.load_factor}`,
+			'', // `Load Factor: ${this.load_factor}`,
 			LOAD_LABEL_X,
 			LOAD_LABEL_Y,
 		);
@@ -216,10 +216,10 @@ export default class ClosedHash extends Hash {
 	}
 
 	insertElement(key, value) {
-		const elem = `<${key}, ${value}>`;
+		const elem = `${key},${value}`;
 		this.commands = [];
 
-		this.cmd(act.setText, this.loadFactorID, `Load Factor: ${this.load_factor}`);
+		// this.cmd(act.setText, this.loadFactorID, `Load Factor: ${this.load_factor}`);
 
 		if (
 			(this.size + 1) / this.table_size > this.load_factor &&
@@ -260,7 +260,7 @@ export default class ClosedHash extends Hash {
 
 			const compareIndex = this.nextIndex++;
 			let tmp = this.hashTableValues[index];
-			this.cmd(act.createLabel, compareIndex, '', EXPLAIN_LABEL_X, EXPLAIN_LABEL_Y + 30, 0);
+			this.cmd(act.createLabel, compareIndex, '', EXPLAIN_LABEL_X, EXPLAIN_LABEL_Y + 50, 0);
 			while (tmp != null && !found) {
 				this.cmd(act.setHighlight, tmp.graphicID, 1);
 				if (tmp.key === key) {
@@ -367,13 +367,13 @@ export default class ClosedHash extends Hash {
 
 	deleteElement(key) {
 		this.commands = [];
-		this.cmd(act.setText, this.ExplainLabel, 'Deleting entry with key: ' + key);
+		this.cmd(act.setText, this.ExplainLabel, 'remove: ' + key);
 		const index = this.doHash(key);
 		if (this.hashTableValues[index] == null) {
 			this.cmd(
 				act.setText,
 				this.ExplainLabel,
-				'Deleting entry with key: ' + key + '  Key not in table',
+				'remove: ' + key + '  Key not found',
 			);
 			return this.commands;
 		}
@@ -408,7 +408,7 @@ export default class ClosedHash extends Hash {
 				this.cmd(
 					act.setText,
 					this.ExplainLabel,
-					'Deleting entry with key: ' + key + '  Entry deleted',
+					'remove: ' + key + '  Entry deleted',
 				);
 				if (tmp.next != null) {
 					this.cmd(act.connect, tmpPrev.graphicID, tmp.next.graphicID);
@@ -428,7 +428,7 @@ export default class ClosedHash extends Hash {
 			this.cmd(
 				act.setText,
 				this.ExplainLabel,
-				'Deleting entry with key: ' + key + '  Key not in table',
+				'remove: ' + key + '  key not found',
 			);
 		}
 		return this.commands;
@@ -436,14 +436,14 @@ export default class ClosedHash extends Hash {
 
 	findElement(key) {
 		this.commands = [];
-		this.cmd(act.setText, this.ExplainLabel, 'Finding entry with key: ' + key);
+		this.cmd(act.setText, this.ExplainLabel, 'get: ' + key);
 
 		const index = this.doHash(key);
 		const compareIndex = this.nextIndex++;
 		let found = false;
 		let tmp = this.hashTableValues[index];
 		let value = null;
-		this.cmd(act.createLabel, compareIndex, '', 10, 40, 0);
+		this.cmd(act.createLabel, compareIndex, '', EXPLAIN_LABEL_X, EXPLAIN_LABEL_Y + 30, 0);
 		while (tmp != null && !found) {
 			this.cmd(act.setHighlight, tmp.graphicID, 1);
 			if (tmp.key === key) {
@@ -461,13 +461,13 @@ export default class ClosedHash extends Hash {
 			this.cmd(
 				act.setText,
 				this.ExplainLabel,
-				'Found entry with key: ' + key + '  Value: ' + value,
+				'Found entry with key: ' + key + '  value: ' + value,
 			);
 		} else {
 			this.cmd(
 				act.setText,
 				this.ExplainLabel,
-				'Finding entry with key: ' + key + '  Not Found!',
+				'get: ' + key + '  not found',
 			);
 		}
 		this.cmd(act.delete, compareIndex);
@@ -624,7 +624,7 @@ export default class ClosedHash extends Hash {
 
 		if (this.table_size * 2 + 1 <= MAX_SIZE) {
 			this.load_factor = LF;
-			this.cmd(act.setText, this.loadFactorID, `Load Factor: ${this.load_factor}`);
+			// this.cmd(act.setText, this.loadFactorID, `Load Factor: ${this.load_factor}`);
 		} else {
 			this.cmd(
 				act.setText,

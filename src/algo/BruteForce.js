@@ -34,7 +34,7 @@ import { act } from '../anim/AnimationMain';
 const ARRAY_START_X = 100;
 const ARRAY_START_Y = 30;
 
-const MAX_LENGTH = 22;
+const MAX_LENGTH = 28;
 
 const COMP_COUNT_X = 575;
 const COMP_COUNT_Y = 30;
@@ -146,15 +146,16 @@ export default class BruteForce extends Algorithm {
 	}
 
 	find(text, pattern) {
+		console.log("find()");
 		this.commands = [];
 
 		const maxRows = text.length - pattern.length + 1;
 		if (maxRows <= 14) {
 			this.cellSize = 30;
 		} else if (maxRows <= 17) {
-			this.cellSize = 25;
+			this.cellSize = 30;
 		} else {
-			this.cellSize = 20;
+			this.cellSize = 25;
 		}
 
 		const labelsX = ARRAY_START_X + text.length * this.cellSize + 10;
@@ -181,7 +182,7 @@ export default class BruteForce extends Algorithm {
 				xpos,
 				ypos,
 			);
-			this.cmd(act.setBackgroundColor, this.nextIndex++, '#D3D3D3');
+			this.cmd(act.setBackgroundColor, this.nextIndex++, global.jpc_bggray);
 		}
 
 		for (let row = 0; row < maxRows; row++) {
@@ -273,7 +274,7 @@ export default class BruteForce extends Algorithm {
 			this.cmd(act.step);
 			this.unhighlight(6, 0);
 			if (j !== pattern.length) {
-				this.cmd(act.setBackgroundColor, this.comparisonMatrixID[row][i + j], '#ffe6c2');
+				this.cmd(act.setBackgroundColor, this.comparisonMatrixID[row][i + j], global.jpc_bghighlight);
 			} else {
 				this.highlight(7, 0);
 				this.cmd(act.step);

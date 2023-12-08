@@ -28,19 +28,19 @@ import Algorithm, { addControlToAlgorithmBar, addDivisorToAlgorithmBar } from '.
 import { act } from '../anim/AnimationMain';
 
 const ARRAY_START_X = 100;
-const ARRAY_START_Y = 200;
+const ARRAY_START_Y = 250;
 const ARRAY_ELEM_WIDTH = 50;
 const ARRAY_ELEM_HEIGHT = 50;
 const RESIZE_ARRAY_START_X = 100;
-const RESIZE_ARRAY_START_Y = 300;
+const RESIZE_ARRAY_START_Y = 350;
 
 const ARRAY_ELEMS_PER_LINE = 14;
 const ARRAY_LINE_SPACING = 130;
 
 const TOP_POS_X = 180;
-const TOP_POS_Y = 100;
+const TOP_POS_Y = 150;
 const TOP_LABEL_X = 120;	// Justus
-const TOP_LABEL_Y = 100;
+const TOP_LABEL_Y = 150;
 
 const PUSH_LABEL_X = 150;	// Justus
 const PUSH_LABEL_Y = 30;
@@ -135,7 +135,7 @@ export default class StackArray extends Algorithm {
 			this.cmd(act.createLabel, this.arrayLabelID[i], i, xpos, ypos + ARRAY_ELEM_HEIGHT);
 			this.cmd(act.setForegroundColor, this.arrayLabelID[i], '#668721'); // Justus
 		}
-		this.cmd(act.createLabel, this.topLabelID, 'Size', TOP_LABEL_X, TOP_LABEL_Y);
+		this.cmd(act.createLabel, this.topLabelID, 'size', TOP_LABEL_X, TOP_LABEL_Y);
 		this.cmd(
 			act.createRectangle,
 			this.topID,
@@ -146,7 +146,7 @@ export default class StackArray extends Algorithm {
 			TOP_POS_Y,
 		);
 
-		this.cmd(act.createLabel, this.leftoverLabelID, '', PUSH_LABEL_X, PUSH_LABEL_Y);
+		this.cmd(act.createLabel, this.leftoverLabelID, '', PUSH_LABEL_X + global.jpleftoveroff, PUSH_LABEL_Y);
 
 		this.highlight1ID = this.nextIndex++;
 		this.highlight2ID = this.nextIndex++;
@@ -214,7 +214,7 @@ export default class StackArray extends Algorithm {
 
 		this.cmd(act.setText, this.leftoverLabelID, '');
 
-		this.cmd(act.createLabel, labPushID, 'Pushing Value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
+		this.cmd(act.createLabel, labPushID, 'pushing value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
 		this.cmd(act.createLabel, labPushValID, elemToPush, PUSH_ELEMENT_X, PUSH_ELEMENT_Y);
 
 		this.cmd(act.step);
@@ -259,7 +259,7 @@ export default class StackArray extends Algorithm {
 
 		this.cmd(act.setText, this.leftoverLabelID, '');
 
-		this.cmd(act.createLabel, labPopID, 'Popped Value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
+		this.cmd(act.createLabel, labPopID, 'popped value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
 
 		this.cmd(act.setHighlight, this.topID, 1);
 		this.cmd(act.step);
@@ -288,7 +288,7 @@ export default class StackArray extends Algorithm {
 		this.cmd(act.step);
 		this.cmd(act.delete, labPopID);
 		this.cmd(act.delete, this.highlight1ID);
-		this.cmd(act.setText, this.leftoverLabelID, 'Popped Value: ' + popVal);
+		this.cmd(act.setText, this.leftoverLabelID, 'popped value: ' + popVal);
 		this.cmd(act.delete, labPopValID);
 
 		this.nextIndex = this.nextIndex - 2;
@@ -303,7 +303,7 @@ export default class StackArray extends Algorithm {
 		const labPushValID = this.nextIndex++;
 		const labPushResizeID = this.nextIndex++;
 
-		this.cmd(act.createLabel, labPushID, 'Pushing Value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
+		this.cmd(act.createLabel, labPushID, 'pushing value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
 		this.cmd(act.createLabel, labPushValID, elemToPush, PUSH_ELEMENT_X, PUSH_ELEMENT_Y);
 		this.cmd(
 			act.createLabel,

@@ -44,11 +44,16 @@ const ARRAY_ELEMS_PER_LINE = 14;
 const ARRAY_LINE_SPACING = 130;
 
 const PUSH_LABEL_X = 100;	// Justus
+const PUSH_INDEX_LABEL_X = 280;	// Justus
 const PUSH_LABEL_Y = 30;
 const PUSH_ELEMENT_X = 200;	// Justus
+const PUSH_INDEX_ELEMENT_X = 335; // Justus
 const PUSH_ELEMENT_Y = 30;
 const PUSH_RESIZE_LABEL_X = 60;
 const PUSH_RESIZE_LABEL_Y = 60;
+const POP_ELEMENT_X = 210;	 // Justus
+const POP_INDEX_LABEL_X = 300;	 // Justus
+const POP_INDEX_ELEMENT_X = 370; // Justus
 
 const SIZE = 7;
 const MAX_SIZE = 30;
@@ -327,9 +332,13 @@ export default class ArrayList extends Algorithm {
 
 		const labPushID = this.nextIndex++;
 		const labPushValID = this.nextIndex++;
+		const labPushIndexID = this.nextIndex++;
+		const labPushIndexValID = this.nextIndex++;
 
-		this.cmd(act.createLabel, labPushID, 'Adding Value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
+		this.cmd(act.createLabel, labPushID, 'adding value ', PUSH_LABEL_X, PUSH_LABEL_Y);
 		this.cmd(act.createLabel, labPushValID, elemToAdd, PUSH_ELEMENT_X, PUSH_ELEMENT_Y);
+		this.cmd(act.createLabel, labPushIndexID, 'at rank ', PUSH_INDEX_LABEL_X, PUSH_LABEL_Y);
+		this.cmd(act.createLabel, labPushIndexValID, index, PUSH_INDEX_ELEMENT_X, PUSH_ELEMENT_Y);
 		this.cmd(act.step);
 
 		for (let i = this.size; i >= index; i--) {
@@ -381,6 +390,8 @@ export default class ArrayList extends Algorithm {
 		this.cmd(act.step);
 
 		this.cmd(act.delete, labPushID);
+		this.cmd(act.delete, labPushIndexID);
+		this.cmd(act.delete, labPushIndexValID);
 		this.cmd(act.step);
 
 		if (index != null) {
@@ -398,19 +409,28 @@ export default class ArrayList extends Algorithm {
 		this.commands = [];
 
 		index = parseInt(index);
+		const labPopID = this.nextIndex++;
 		const labPopValID = this.nextIndex++;
+		const labPopIndexID = this.nextIndex++;
+		const labPopIndexValID = this.nextIndex++;
 
 		const xpos = (index % ARRAY_ELEMS_PER_LINE) * ARRAY_ELEM_WIDTH + ARRAY_START_X;
 		const ypos = Math.floor(index / ARRAY_ELEMS_PER_LINE) * ARRAY_LINE_SPACING + ARRAY_START_Y;
 
 		this.cmd(act.createHighlightCircle, this.highlight1ID, '#668721', xpos, ypos);
+		this.cmd(act.createLabel, labPopID, 'removing value ', PUSH_LABEL_X, PUSH_LABEL_Y);
 		this.cmd(act.createLabel, labPopValID, this.arrayData[index], xpos, ypos);
+		this.cmd(act.createLabel, labPopIndexID, 'from rank ', POP_INDEX_LABEL_X, PUSH_LABEL_Y);
+		this.cmd(act.createLabel, labPopIndexValID, index, POP_INDEX_ELEMENT_X, PUSH_LABEL_Y);
 		this.cmd(act.setText, this.arrayID[index], '');
-		this.cmd(act.move, this.highlight1ID, xpos, ypos - 100);
-		this.cmd(act.move, labPopValID, xpos, ypos - 100);
+		this.cmd(act.move, this.highlight1ID, POP_ELEMENT_X, ypos - 100);
+		this.cmd(act.move, labPopValID, POP_ELEMENT_X, ypos - 100);
 		this.cmd(act.step);
 
 		this.cmd(act.delete, labPopValID);
+		this.cmd(act.delete, labPopID);
+		this.cmd(act.delete, labPopIndexValID);
+		this.cmd(act.delete, labPopIndexID);
 		this.cmd(act.delete, this.highlight1ID);
 		this.cmd(act.step);
 

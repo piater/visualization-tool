@@ -39,25 +39,25 @@ import Algorithm, {
 } from './Algorithm.js';
 import { act } from '../anim/AnimationMain';
 
-const MAX_HASH_LENGTH = 4;
+const MAX_HASH_LENGTH = 9;
 const MAX_LOAD_LENGTH = 5;
 
 const HASH_NUMBER_START_X = 300;
 const HASH_X_DIFF = 14;
-const HASH_NUMBER_START_Y = 10;
-const HASH_ADD_START_Y = 40;
+const HASH_NUMBER_START_Y = 50;
+const HASH_ADD_START_Y = 80;
 const HASH_INPUT_START_X = 120;
 const HASH_INPUT_X_DIFF = 14;
-const HASH_INPUT_START_Y = 40;
-const HASH_ADD_LINE_Y = 65;
-const HASH_RESULT_Y = 70;
+const HASH_INPUT_START_Y = 80;
+const HASH_ADD_LINE_Y = 105;
+const HASH_RESULT_Y = 110;
 const ELF_HASH_SHIFT = 10;
 
 const HASH_LABEL_X = 270;
 const HASH_LABEL_Y = 46;
 const HASH_LABEL_DELTA_X = 45;
 
-const HIGHLIGHT_COLOR = '#002459';
+const HIGHLIGHT_COLOR = global.jpc_highlight; // '#002459';
 
 export default class Hash extends Algorithm {
 	constructor(am, w, h) {

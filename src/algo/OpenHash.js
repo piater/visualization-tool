@@ -28,14 +28,14 @@ import Hash from './Hash.js';
 import { act } from '../anim/AnimationMain';
 import { addDropDownGroupToAlgorithmBar } from './Algorithm.js';
 
-const ARRAY_ELEM_WIDTH = 100;
+const ARRAY_ELEM_WIDTH = 145;
 const ARRAY_ELEM_HEIGHT = 40;
-const ARRAY_ELEM_START_Y = 110;
+const ARRAY_ELEM_START_Y = 220;
 const ARRAY_VERTICAL_SEPARATION = 70;
 
 const CLOSED_HASH_TABLE_SIZE = 7;
 
-const ARRAY_ELEM_START_X = 100;
+const ARRAY_ELEM_START_X = 80;
 // If you want to center the array:
 // const ARRAY_ELEM_START_X = (window.screen.width - CLOSED_HASH_TABLE_SIZE * ARRAY_ELEM_WIDTH + ARRAY_ELEM_WIDTH) / 2;
 const ARRAY_RESIZE_ELEM_START_Y = 240;
@@ -54,7 +54,7 @@ const DEFAULT_LOAD_FACTOR = 0.67;
 
 const MAX_SIZE = 70;
 
-const INDEX_COLOR = '#0000FF';
+const INDEX_COLOR = '#668721';
 
 export default class OpenHash extends Hash {
 	constructor(am, w, h) {
@@ -144,7 +144,7 @@ export default class OpenHash extends Hash {
 		) {
 			this.resize(false);
 		}
-		this.cmd(act.setText, this.ExplainLabel, 'Inserting element: ' + elem);
+		this.cmd(act.setText, this.ExplainLabel, 'put: ' + elem);
 		this.cmd(act.step);
 
 		let index = this.doHash(key);
@@ -264,7 +264,7 @@ export default class OpenHash extends Hash {
 				this.cmd(
 					act.setText,
 					this.ExplainLabel,
-					'Encountered null spot, so terminate loop',
+					'Encountered empty field, so terminate loop',
 				);
 			} else if (this.hashTableValues[index].key === key) {
 				this.cmd(
@@ -293,12 +293,12 @@ export default class OpenHash extends Hash {
 		} else {
 			if (removedIndex !== -1) {
 				this.cmd(act.setHighlight, this.hashTableVisual[index], 0);
-				this.cmd(act.setText, this.ExplainLabel, 'Inserting at earliest DEL spot');
+				this.cmd(act.setText, this.ExplainLabel, 'Inserting into earliest deleted field');
 				index = removedIndex;
 			} else if (this.hashTableValues[index] == null) {
-				this.cmd(act.setText, this.ExplainLabel, 'Inserting at null spot');
+				this.cmd(act.setText, this.ExplainLabel, 'Inserting into empty field');
 			} else if (this.hashTableValues[index].key === key) {
-				this.cmd(act.setText, this.ExplainLabel, 'Inserting at DEL spot with same key');
+				this.cmd(act.setText, this.ExplainLabel, 'Inserting into deleted field with same key');
 			}
 			this.cmd(act.setHighlight, this.hashTableVisual[index], 1);
 			this.cmd(act.step);
@@ -359,7 +359,7 @@ export default class OpenHash extends Hash {
 
 	deleteElement(key) {
 		this.commands = [];
-		this.cmd(act.setText, this.ExplainLabel, 'Deleting element with key: ' + key);
+		this.cmd(act.setText, this.ExplainLabel, 'remove: ' + key);
 		let index = this.doHash(key);
 
 		index = this.getElemIndex(index, key);
@@ -373,13 +373,13 @@ export default class OpenHash extends Hash {
 			);
 			// this.empty[index] = true;
 			this.deleted[index] = true;
-			this.cmd(act.setText, this.hashTableVisual[index], 'DEL');
+			this.cmd(act.setText, this.hashTableVisual[index], 'deleted');
 			this.size--;
 		} else {
 			this.cmd(
 				act.setText,
 				this.ExplainLabel,
-				'Deleting element with key: ' + key + '  Key not in table',
+				'remove: ' + key + '  key not found',
 			);
 		}
 		return this.commands;
@@ -388,18 +388,18 @@ export default class OpenHash extends Hash {
 	findElement(key) {
 		this.commands = [];
 
-		this.cmd(act.setText, this.ExplainLabel, 'Finding Key: ' + key);
+		this.cmd(act.setText, this.ExplainLabel, 'get: ' + key);
 		const index = this.doHash(key);
 
-		const found = this.getElemIndex(index, key) !== -1;
-		if (found) {
+		const found = this.getElemIndex(index, key);
+		if (found !== -1) {
 			this.cmd(
 				act.setText,
 				this.ExplainLabel,
-				'Found Key: ' + key + '  Value: ' + this.hashTableValues[index].val,
+				'Found Key: ' + key + '  Value: ' + this.hashTableValues[found].val,
 			);
 		} else {
-			this.cmd(act.setText, this.ExplainLabel, 'Finding Key: ' + key + '  Not Found!');
+			this.cmd(act.setText, this.ExplainLabel, 'get: ' + key + '  not found');
 		}
 		return this.commands;
 	}
@@ -566,7 +566,7 @@ export default class OpenHash extends Hash {
 
 		if (this.table_size * 2 + 1 <= MAX_SIZE) {
 			this.load_factor = LF;
-			this.cmd(act.setText, this.loadFactorID, `Load Factor: ${this.load_factor}`);
+			// this.cmd(act.setText, this.loadFactorID, `Load Factor: ${this.load_factor}`);
 		} else {
 			this.cmd(
 				act.setText,
@@ -583,7 +583,7 @@ export default class OpenHash extends Hash {
 	setup() {
 		this.resetIndex = this.nextIndex;
 		this.table_size = CLOSED_HASH_TABLE_SIZE;
-		this.nextLowestPrime = 11;
+		this.nextLowestPrime = 5;
 		this.load_factor = DEFAULT_LOAD_FACTOR;
 		this.skipDist = new Array(this.table_size);
 		this.hashTableVisual = new Array(this.table_size);
@@ -641,13 +641,13 @@ export default class OpenHash extends Hash {
 			);
 			this.cmd(act.setForegroundColor, this.indexLabelID[i], INDEX_COLOR);
 		}
-		this.cmd(act.createLabel, this.ExplainLabel, '', 10, 40, 0);
-		this.cmd(act.createLabel, this.HashIndexID, '', HASH2_LABEL_X + 300, HASH2_LABEL_Y + 5);
+		this.cmd(act.createLabel, this.ExplainLabel, '', 10, 20, 0);
+		this.cmd(act.createLabel, this.HashIndexID, '', HASH2_LABEL_X + 300, HASH2_LABEL_Y + 60);
 		this.cmd(act.createLabel, this.DelIndexLabel, '', 10, 60, 0);
 		this.cmd(
 			act.createLabel,
 			this.loadFactorID,
-			`Load Factor: ${this.load_factor}`,
+			'', // `Load Factor: ${this.load_factor}`,
 			LOAD_LABEL_X,
 			LOAD_LABEL_Y,
 		);
@@ -790,6 +790,6 @@ class MapEntry {
 	constructor(key, val) {
 		this.key = key;
 		this.val = val;
-		this.elem = `<${key}, ${val}>`;
+		this.elem = `${key},${val}`;
 	}
 }
