@@ -24,27 +24,20 @@
 // authors and should not be interpreted as representing official policies, either expressed
 // or implied, of the University of San Francisco
 
+import '../jpcolors.js'
+
 import Algorithm, {
 	addControlToAlgorithmBar,
 	addDivisorToAlgorithmBar,
-	addGroupToAlgorithmBar,
 	addLabelToAlgorithmBar,
 	addRadioButtonGroupToAlgorithmBar,
 } from './Algorithm.js';
 import { act } from '../anim/AnimationMain';
 
-const MAX_ARRAY_SIZE = 18;
-
 const ARRAY_START_X = 50;
 const ARRAY_START_Y = 50;
 const ARRAY_ELEM_WIDTH = 50;
 const ARRAY_ELEM_HEIGHT = 50;
-
-const COMP_COUNT_X = 100;
-const COMP_COUNT_Y = 50;
-
-const CODE_START_X = 50;
-const CODE_START_Y = 180;
 
 export default class QuickSort extends Algorithm {
 	constructor(am, w, h) {
@@ -57,17 +50,10 @@ export default class QuickSort extends Algorithm {
 	addControls() {
 		this.controls = [];
 
-		const verticalGroup = addGroupToAlgorithmBar(false);
-
-		addLabelToAlgorithmBar(
-			'Comma seperated list (e.g. "3,1,2"). Max 18 elements & no elements > 999',
-			verticalGroup,
-		);
-
-		const horizontalGroup = addGroupToAlgorithmBar(true, verticalGroup);
+		addLabelToAlgorithmBar('Comma separated list (e.g. "3,1,2", max 18 elements)');
 
 		// List text field
-		this.listField = addControlToAlgorithmBar('Text', '', horizontalGroup);
+		this.listField = addControlToAlgorithmBar('Text', '');
 		this.listField.onkeydown = this.returnSubmit(
 			this.listField,
 			this.sortCallback.bind(this),
@@ -77,11 +63,9 @@ export default class QuickSort extends Algorithm {
 		this.controls.push(this.listField);
 
 		// Sort button
-		this.sortButton = addControlToAlgorithmBar('Button', 'Sort', horizontalGroup);
-		this.sortButton.onclick = this.sortCallback.bind(this);
-		this.controls.push(this.sortButton);
-
-		addDivisorToAlgorithmBar();
+		this.findButton = addControlToAlgorithmBar('Button', 'Sort');
+		this.findButton.onclick = this.sortCallback.bind(this);
+		this.controls.push(this.findButton);
 
 		// Clear button
 		this.clearButton = addControlToAlgorithmBar('Button', 'Clear');
@@ -109,60 +93,18 @@ export default class QuickSort extends Algorithm {
 		this.pivotType = 'random';
 		*/
 
-		this.controls.push(this.randomPivotSelect);
-		this.controls.push(this.perfectPivotSelect);
-		this.controls.push(this.firstPivotSelect);
-		this.controls.push(this.minPivotSelect);
-
 		addDivisorToAlgorithmBar();
 	}
 
 	setup() {
-		this.commands = [];
 		this.arrayData = [];
 		this.displayData = [];
 		this.arrayID = [];
 		this.iPointerID = 0;
 		this.jPointerID = 0;
 		this.pPointerID = 0;
-		this.comparisonCountID = this.nextIndex++;
 
-		this.compCount = 0;
-		this.cmd(
-			act.createLabel,
-			this.comparisonCountID,
-			'Comparison Count: ' + this.compCount,
-			COMP_COUNT_X,
-			COMP_COUNT_Y,
-		);
-
-		this.code = [
-			['procedure QuickSort(array, left, right):'],
-			['     pivotIdx <- random index within region being sorted'],
-			['     pivot <- array[pivotIdx]'],
-			['     swap array[left] and array[pivotIdx]'],
-			['     i <- left + 1, j <- right - 1'],
-			['     while i <= j do'],
-			['          while ', 'i <= j', ' and ', 'array[i] <= pivot'],
-			['               i <- i + 1'],
-			['          end while'],
-			['          while ', 'i <= j', ' and ', 'array[j] >= pivot'],
-			['               j <- j - 1'],
-			['          end while'],
-			['          if i <= j then'],
-			['               swap array[i] and array[j]'],
-			['               i <- i + 1, j <- j - 1'],
-			['          end if'],
-			['     end while'],
-			['     swap pivot and array[j]'],
-			['     QuickSort on array, left, j'],
-			['     QuickSort on array, j + 1, right'],
-			['end procedure'],
-		];
-
-		this.codeID = this.addCodeToCanvasBase(this.code, CODE_START_X, CODE_START_Y);
-
-		this.animationManager.startNewAnimation(this.commands);
+		this.animationManager.startNewAnimation();
 		this.animationManager.skipForward();
 		this.animationManager.clearHistory();
 	}
@@ -172,23 +114,15 @@ export default class QuickSort extends Algorithm {
 		this.arrayData = [];
 		this.displayData = [];
 		this.arrayID = [];
-		this.removeCode(this.codeID);
 		this.iPointerID = 0;
 		this.jPointerID = 0;
 		this.pPointerID = 0;
-		this.comparisonCountID = this.nextIndex++;
-		this.compCount = 0;
-		this.codeID = this.addCodeToCanvasBase(this.code, CODE_START_X, CODE_START_Y);
 	}
 
 	sortCallback() {
-		const list = this.listField.value.split(',').filter(x => x !== '');
-		if (
-			this.listField.value !== '' &&
-			list.length <= MAX_ARRAY_SIZE &&
-			list.map(Number).filter(x => x > 999 || Number.isNaN(x)).length <= 0
-		) {
+		if (this.listField.value !== '') {
 			this.implementAction(this.clear.bind(this));
+			const list = this.listField.value;
 			this.listField.value = '';
 			this.implementAction(this.sort.bind(this), list);
 		}
@@ -206,8 +140,6 @@ export default class QuickSort extends Algorithm {
 		this.arrayData = [];
 		this.arrayID = [];
 		this.displayData = [];
-		this.compCount = 0;
-		this.cmd(act.setText, this.comparisonCountID, 'Comparison Count: ' + this.compCount);
 		return this.commands;
 	}
 
@@ -216,9 +148,10 @@ export default class QuickSort extends Algorithm {
 
 		this.arrayID = [];
 		this.arrayData = params
+			.split(',')
 			.map(Number)
-			.filter(x => !Number.isNaN(x))
-			.slice(0, MAX_ARRAY_SIZE);
+			.filter(x => x)
+			.slice(0, 18);
 		this.displayData = new Array(this.arrayData.length);
 
 		const elemCounts = new Map();
@@ -268,27 +201,21 @@ export default class QuickSort extends Algorithm {
 	helper(left, right) {
 		if (left > right) return;
 
-		this.highlight(0, 0);
-
 		// Hightlight cells in the current sub-array
 		for (let i = left; i <= right; i++) {
 			this.cmd(act.setBackgroundColor, this.arrayID[i], '#E3F0FF');
 		}
 		this.cmd(act.step);
-		this.unhighlight(0, 0);
 
 		if (left === right) {
 			this.cmd(act.setBackgroundColor, this.arrayID[left], '#D1FF8E');
 			this.cmd(act.step);
-			this.unhighlight(0, 0);
 			return;
 		}
 
 		// Create pivot pointer and swap with left-most element
 		// To make things more interesting (and clearer), we don't pick the left-most element as pivot
 		let pivot;
-		this.highlight(1, 0);
-		this.highlight(2, 0);
 		if (this.pivotType === 'min') {
 			let min = left;
 			for (let i = left + 1; i <= right; i++) {
@@ -310,13 +237,8 @@ export default class QuickSort extends Algorithm {
 		const pXPos = pivot * ARRAY_ELEM_WIDTH + ARRAY_START_X;
 		this.cmd(act.createHighlightCircle, this.pPointerID, '#668721', pXPos, ARRAY_START_Y);
 		this.cmd(act.step);
-		this.unhighlight(1, 0);
-		this.unhighlight(2, 0);
-		this.highlight(3, 0);
 		this.swapPivot(pivot, left);
-		this.cmd(act.step);
-		this.unhighlight(3, 0);
-		this.highlight(4, 0);
+
 		// Partition
 		let i = left + 1;
 		let j = right;
@@ -325,106 +247,33 @@ export default class QuickSort extends Algorithm {
 		this.cmd(act.createHighlightCircle, this.iPointerID, '#002459', iXPos, ARRAY_START_Y);
 		this.cmd(act.createHighlightCircle, this.jPointerID, '#002459', jXPos, ARRAY_START_Y);
 		this.cmd(act.step);
-		this.unhighlight(4, 0);
-		this.highlight(5, 0);
 		while (i <= j) {
-			this.cmd(act.step);
-			this.highlight(6, 0);
-			this.unhighlight(5, 0);
-			this.highlight(6, 1);
-			this.cmd(act.step);
-			this.unhighlight(6, 0);
-			this.unhighlight(6, 1);
-			this.highlight(6, 3);
-			this.cmd(act.step);
 			while (i <= j && this.arrayData[left] >= this.arrayData[i]) {
-				this.unhighlight(6, 3);
-				this.highlight(7, 0);
 				i++;
-				this.cmd(
-					act.setText,
-					this.comparisonCountID,
-					'Comparison Count: ' + ++this.compCount,
-				);
 				this.movePointers(i, j);
-				this.unhighlight(7, 0);
-				this.highlight(6, 1);
-				if (i <= j) {
-					this.cmd(act.step);
-					this.unhighlight(6, 1);
-					this.highlight(6, 3);
-				}
-				this.cmd(act.step);
 			}
-			this.unhighlight(6, 1);
-			this.unhighlight(6, 3);
 			if (i <= j) {
 				this.cmd(act.setForegroundColor, this.iPointerID, '#FF8000');
-				// One additional comparison will be made in the above loop if i <= j
-				this.cmd(
-					act.setText,
-					this.comparisonCountID,
-					'Comparison Count: ' + ++this.compCount,
-				);
-			}
-
-			this.highlight(9, 0);
-			this.cmd(act.step);
-			this.unhighlight(9, 0);
-			this.highlight(9, 1);
-			if (i <= j) {
 				this.cmd(act.step);
-				this.unhighlight(9, 1);
-				this.highlight(9, 3);
 			}
-
-			this.cmd(act.step);
 			while (i <= j && this.arrayData[left] <= this.arrayData[j]) {
-				this.unhighlight(9, 3);
-				this.highlight(10, 0);
 				j--;
-				this.cmd(
-					act.setText,
-					this.comparisonCountID,
-					'Comparison Count: ' + ++this.compCount,
-				);
 				this.movePointers(i, j);
-				this.unhighlight(10, 0);
-				this.highlight(9, 1);
-				if (i <= j) {
-					this.cmd(act.step);
-					this.unhighlight(9, 1);
-					this.highlight(9, 3);
-				}
-				this.cmd(act.step);
 			}
-			this.unhighlight(9, 1);
-			this.unhighlight(9, 3);
 			if (i <= j) {
 				this.cmd(act.setForegroundColor, this.jPointerID, '#FF8000');
-				this.cmd(
-					act.setText,
-					this.comparisonCountID,
-					'Comparison Count: ' + ++this.compCount,
-				);
 				this.cmd(act.step);
 			}
 			if (i <= j) {
-				this.highlight(13, 0);
 				this.swap(i, j);
-				this.unhighlight(13, 0);
-				this.highlight(14, 0);
 				i++;
 				j--;
 				this.movePointers(i, j);
-				this.unhighlight(14, 0);
 			}
 		}
 
-		this.highlight(17, 0);
 		// Move pivot back and delete pivot pointer
 		this.swapPivot(left, j, true);
-		this.unhighlight(17, 0);
 
 		// Delete i and j pointers
 		this.cmd(act.delete, this.iPointerID);
@@ -439,16 +288,7 @@ export default class QuickSort extends Algorithm {
 		this.cmd(act.setBackgroundColor, this.arrayID[j], '#D1FF8E');
 		this.cmd(act.step);
 
-		this.highlight(18, 0);
-		this.cmd(act.step);
-		this.unhighlight(18, 0);
-
 		this.helper(left, j - 1);
-
-		this.highlight(19, 0);
-		this.cmd(act.step);
-		this.unhighlight(19, 0);
-
 		this.helper(j + 1, right);
 	}
   */
@@ -483,7 +323,7 @@ export default class QuickSort extends Algorithm {
 		this.cmd(act.step);
 		while (j <= right) {
 			if (this.arrayData[j] < this.arrayData[pivot]) {
-				this.cmd(act.setForegroundColor, this.jPointerID, '#FF8000');
+				this.cmd(act.setForegroundColor, this.jPointerID, global.jpc_highlight);
 				this.cmd(act.step);
 				this.swap(i, j);
 				this.cmd(act.setForegroundColor, this.jPointerID, '#002459');
