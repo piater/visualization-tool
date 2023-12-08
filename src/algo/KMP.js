@@ -32,11 +32,12 @@ import Algorithm, {
 import { act } from '../anim/AnimationMain';
 
 const ARRAY_START_X = 100;
-const ARRAY_START_Y = 120;	// Justus: 30
+const ARRAY_START_Y = 150;	// Justus: 30
 
-const MAX_LENGTH = 22;
+const MAX_LENGTH = 28;
 
-const FAILURE_TABLE_START_Y = 30; // Justus: 100
+const FAILURE_TABLE_START_Y = 60; // Justus: 100
+const INDEX_COLOR = '#668721';	  // Justus
 
 const COMP_COUNT_X = 575;
 const COMP_COUNT_Y = 30;
@@ -105,6 +106,7 @@ export default class KMP extends Algorithm {
 		this.failureTableLabelID = this.nextIndex++;
 		this.failureTableCharacterID = [];
 		this.failureTableValueID = [];
+		this.failureTableIndexID = [];
 		this.codeID = [];
 
 		this.comparisonCountID = this.nextIndex++;
@@ -112,6 +114,7 @@ export default class KMP extends Algorithm {
 		this.compCount = 0;
 		this.cmd(act.createLabel, this.comparisonCountID, '', COMP_COUNT_X, COMP_COUNT_Y, 0);
 
+		this.failureTable = null;
 		this.failureTableCode = [
 			['procedure KMPFailureTable(pattern):'],
 			['     m <- length of pattern'],
@@ -163,6 +166,7 @@ export default class KMP extends Algorithm {
 		this.failureTableLabelID = this.nextIndex++;
 		this.failureTableCharacterID = [];
 		this.failureTableValueID = [];
+		this.failureTableIndexID = [];
 		this.codeID = [];
 		this.comparisonCountID = this.nextIndex++;
 		this.compCount = 0;
@@ -248,9 +252,11 @@ export default class KMP extends Algorithm {
 			}
 		}
 
-		const failureTable = this.buildFailureTable(text.length, pattern);
+		if (this.failureTable === null) {
+			this.failureTable = this.buildFailureTable(text.length, pattern);
+		}
 		this.removeCode(this.codeID);
-		const tableStartX = ARRAY_START_X + text.length * this.cellSize + 110;
+		const tableStartX = ARRAY_START_X + 190; // text.length * this.cellSize + 110;
 
 		this.codeID = this.addCodeToCanvasBase(
 			this.KMPCode,
@@ -282,7 +288,7 @@ export default class KMP extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			fjPointerID,
-			'#FF8000',
+			this.jpc_highlight,
 			ARRAY_START_X,
 			ARRAY_START_Y + this.cellSize,
 			this.cellSize / 2,
@@ -290,7 +296,7 @@ export default class KMP extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			f0PointerID,
-			'#FF8000',
+			this.jpc_highlight,
 			tableStartX,
 			FAILURE_TABLE_START_Y,
 			this.cellSize / 2,
@@ -298,7 +304,7 @@ export default class KMP extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			f1PointerID,
-			'#FF8000',
+			this.jpc_highlight,
 			tableStartX,
 			FAILURE_TABLE_START_Y + this.cellSize,
 			this.cellSize / 2,
@@ -333,7 +339,7 @@ export default class KMP extends Algorithm {
 				this.cmd(
 					act.setText,
 					this.comparisonCountID,
-					'Comparison Count: ' + ++this.compCount,
+				  '' // 'Comparison Count: ' + ++this.compCount,
 				);
 				this.cmd(act.setBackgroundColor, this.comparisonMatrixID[row][i + j], '#D1FF8E');
 				j++;
@@ -353,7 +359,7 @@ export default class KMP extends Algorithm {
 				this.cmd(
 					act.setText,
 					this.comparisonCountID,
-					'Comparison Count: ' + ++this.compCount,
+				        '' // 'Comparison Count: ' + ++this.compCount,
 				);
 			}
 			this.highlight(7, 0);
@@ -385,7 +391,7 @@ export default class KMP extends Algorithm {
 					this.unhighlight(11, 0);
 				}
 				this.highlight(12, 0);
-				const nextAlignment = failureTable[j - 1];
+				const nextAlignment = this.failureTable[j - 1];
 				this.cmd(
 					act.setPosition,
 					fjPointerID,
@@ -476,7 +482,7 @@ export default class KMP extends Algorithm {
 	onlyBuildFailureTable(textLength, pattern) {
 		this.commands = [];
 		this.cellSize = 30;
-		this.buildFailureTable(textLength, pattern);
+		this.failureTable = this.buildFailureTable(textLength, pattern);
 		return this.commands;
 	}
 
@@ -495,12 +501,13 @@ export default class KMP extends Algorithm {
 		this.codeID = this.addCodeToCanvasBase(this.failureTableCode, labelX, CODE_Y);
 
 		this.cmd(act.move, this.comparisonCountID, labelX, COMP_COUNT_Y);
-		this.cmd(act.setText, this.comparisonCountID, 'Comparison Count: ' + this.compCount);
+		this.cmd(act.setText, this.comparisonCountID, ''); // 'Comparison Count: ' + this.compCount);
 
 		// Display empty failure table
 		const tableStartX = ARRAY_START_X + 190;
 		this.failureTableCharacterID = new Array(pattern.length);
 		this.failureTableValueID = new Array(pattern.length);
+		this.failureTableIndexID = new Array(pattern.length);
 		for (let i = 0; i < pattern.length; i++) {
 			const xpos = tableStartX + i * this.cellSize;
 			this.failureTableCharacterID[i] = this.nextIndex++;
@@ -524,6 +531,15 @@ export default class KMP extends Algorithm {
 				xpos,
 				FAILURE_TABLE_START_Y + this.cellSize,
 			);
+			this.failureTableIndexID[i] = this.nextIndex++;
+			this.cmd(
+				act.createLabel,
+				this.failureTableIndexID[i],
+				i,
+				xpos,
+				FAILURE_TABLE_START_Y - this.cellSize,
+			);
+			this.cmd(act.setForegroundColor, this.failureTableIndexID[i], INDEX_COLOR);
 		}
 		this.cmd(act.step);
 
@@ -541,7 +557,7 @@ export default class KMP extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			jPointerID,
-			'#FF8000',
+			this.jpc_highlight,
 			tableStartX + this.cellSize,
 			FAILURE_TABLE_START_Y,
 			this.cellSize / 2,
@@ -559,7 +575,7 @@ export default class KMP extends Algorithm {
 		let j = 1;
 		this.highlight(5, 0);
 		while (j < pattern.length) {
-			this.cmd(act.setText, this.comparisonCountID, 'Comparison Count: ' + ++this.compCount);
+			this.cmd(act.setText, this.comparisonCountID, ''); // 'Comparison Count: ' + ++this.compCount);
 			this.highlight(6, 0);
 			this.cmd(act.step);
 			this.unhighlight(6, 0);
@@ -657,18 +673,25 @@ export default class KMP extends Algorithm {
 		if (this.failureTableValueID.length !== 0) {
 			this.cmd(act.delete, this.failureTableLabelID);
 		}
-		for (let i = 0; i < this.failureTableCharacterID.length; i++) {
-			this.cmd(act.delete, this.failureTableCharacterID[i]);
-			this.cmd(act.delete, this.failureTableValueID[i]);
-		}
 
 		this.removeCode(this.codeID);
 		this.codeID = [];
 
 		this.compCount = 0;
 		this.cmd(act.setText, this.comparisonCountID, '');
+		return this.commands;
+	}
+
+	clearFailureTable() {
+		this.commands = [];
+		for (let i = 0; i < this.failureTableCharacterID.length; i++) {
+			this.cmd(act.delete, this.failureTableCharacterID[i]);
+			this.cmd(act.delete, this.failureTableValueID[i]);
+			this.cmd(act.delete, this.failureTableIndexID[i]);
+		}
 		this.failureTableCharacterID = [];
 		this.failureTableValueID = [];
+		this.failureTableIndexID = [];
 		return this.commands;
 	}
 
