@@ -29,6 +29,8 @@
 
 /* global canvas */
 
+import '../jpsave.js';		// Justus
+
 import {
 	UndoCreate,
 	UndoHighlight,
@@ -396,6 +398,7 @@ export default class AnimationManager extends EventListener {
 		this.awaitingStep = false;
 		this.currentBlock = [];
 		this.undoBlock = [];
+		// this.saveSVG('startNB'); // Justus
 		if (this.currentAnimation === this.animationSteps.length) {
 			this.currentlyAnimating = false;
 			this.awaitingStep = false;
@@ -403,9 +406,10 @@ export default class AnimationManager extends EventListener {
 			this.stopTimer();
 			this.animatedObjects.update();
 			this.animatedObjects.draw();
-			this.saveSVG(); // Justus
+			//// this.saveSVG('AnimEnd'); // Justus
 			return;
 		}
+		//// this.saveSVG('startNBbeg'); // Justus
 		this.undoAnimationStepIndices.push(this.currentAnimation);
 
 		this.foundBreak = false;
@@ -414,6 +418,7 @@ export default class AnimationManager extends EventListener {
 		while (this.currentAnimation < this.animationSteps.length && !this.foundBreak) {
 			const [act, params] = this.animationSteps[this.currentAnimation];
 			act.call(this, params);
+			//// this.saveSVG('startNBloop'); // Justus
 			this.currentAnimation++;
 		}
 		this.currFrame = 0;
@@ -429,18 +434,19 @@ export default class AnimationManager extends EventListener {
 			this.currFrame = this.animationBlockLength;
 		}
 
+		//// this.saveSVG('startNBend'); // Justus
 		this.undoStack.push(this.undoBlock);
 	}
 
-	saveSVG() {
-		if (false) {	// Justus
+	saveSVG(trigger) {
+		if (global.jpsaveSVG) { // Justus
 		  this.objectManager.c2s.width = canvas.width;
 		  this.objectManager.c2s.height = canvas.height;
 		  this.objectManager.c2s.__root.setAttribute("width", canvas.width);
 		  this.objectManager.c2s.__root.setAttribute("height", canvas.height);
 		  saveAs(new Blob([this.objectManager.c2s.getSerializedSvg(true)],
 				  {type:"image/svg+xml"}),
-			 "vt-" + Date.now() + ".svg");
+			 "vt-" + Date.now() + ".svg"); // + "-" + trigger
 		}
 	}
 
@@ -495,7 +501,7 @@ export default class AnimationManager extends EventListener {
 
 	// Step forwards one step.  A no-op if the animation is not currently paused
 	step() {
-		this.saveSVG();	// Justus
+		//// this.saveSVG('step');	// Justus
 		if (this.awaitingStep) {
 			this.startNextBlock();
 			this.fireEvent('AnimationStarted', 'NoData');
@@ -602,7 +608,7 @@ export default class AnimationManager extends EventListener {
 			this.stopTimer();
 			this.animatedObjects.update();
 			this.animatedObjects.draw();
-			this.saveSVG(); // Justus
+			//// this.saveSVG('skipFwd'); // Justus
 		}
 	}
 
@@ -630,7 +636,7 @@ export default class AnimationManager extends EventListener {
 			this.stopTimer();
 			this.animatedObjects.update();
 			this.animatedObjects.draw();
-			this.saveSVG(); // Justus
+			//// this.saveSVG('finishUB'); // Justus
 			return false;
 		}
 		return true;
@@ -681,6 +687,9 @@ export default class AnimationManager extends EventListener {
 
 	update() {
 		if (this.currentlyAnimating) {
+			// if (this.currFrame === 0) {
+			// 	this.saveSVG('update');
+			// }
 			this.currFrame = this.currFrame + 1;
 			let i;
 			for (i = 0; i < this.currentBlock.length; i++) {
@@ -768,10 +777,13 @@ export default class AnimationManager extends EventListener {
 	timeout() {
 		// We need to set the timeout *first*, otherwise if we
 		// try to clear it later, we get behavior we don't want ...
-		this.timer = setTimeout(() => this.timeout(), 30);
+		this.timer = setTimeout(() => this.timeout(), global.jptimeout);
 		this.update();
 		this.objectManager.draw();
-		if (false) {	// Justus
+		//// if (this.currFrame === 1) {
+ 		this.saveSVG('timeout');
+		//// }
+		if (global.jpsavePNG) { // Justus
 			this.canvas.current.toBlob(function(blob) {
 		      saveAs(blob, "vt-" + Date.now() + ".png");
 		    });
@@ -792,7 +804,7 @@ export default class AnimationManager extends EventListener {
 	}
 
 	startTimer() {
-		this.timer = setTimeout(() => this.timeout(), 30);
+		this.timer = setTimeout(() => this.timeout(), global.jptimeout);
 	}
 
 	stopTimer() {
@@ -841,7 +853,8 @@ export const act = {
 		// fromID, toID | color, curve, directed, label, anchorPos, thickness
 		params[2] = params[2] || '#000000';
 		params[3] = params[3] || 0.0;
-		params[4] = params[4] || false; // !== false && params[4] !== 0;
+		params[4] = global.jparrows ? (params[4] !== false && params[4] !== 0)
+			: (params[4] || false);
 		params[5] = params[5] === undefined ? '' : params[5];
 		params[6] = params[6] || 0;
 		params[7] = params[7] === undefined ? 1 : params[7];
