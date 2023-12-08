@@ -34,15 +34,15 @@ import Algorithm, {
 import { act } from '../anim/AnimationMain';
 
 const MAX_SIZE = 32;
-const LENGTH = 8;
+const LENGTH = 17;
 
-const MAX_ARRAY_SIZE = 17;
+const MAX_ARRAY_SIZE = 31;
 const ARRAY_ELEM_WIDTH = 40;
 const ARRAY_ELEM_HEIGHT = 40;
 const ARRAY_INITIAL_X = 30;
 
-const ARRAY_Y_POS = 70;
-const ARRAY_LABEL_Y_POS = 110;
+const ARRAY_Y_POS = 110;
+const ARRAY_LABEL_Y_POS = 150;
 
 const ARRAY_RESIZE_Y_POS = 100;
 const ARRAY_RESIZE_LABEL_Y_POS = 125;
@@ -52,14 +52,10 @@ const HEAP_X_POSITIONS = [
 	275, 325, 375, 425, 475, 525, 575, 625, 675, 725, 775, 825,
 ];
 
-const HEAP_Y_OFF = 60;
 const HEAP_Y_POSITIONS = [
-	0, 180, 250, 250, 320, 320, 320, 320, 390, 390, 390, 390, 390, 390, 390, 390, 460, 460, 460,
-	460, 460, 460, 460, 460, 460, 460, 460, 460, 460, 460, 460, 460,
+	0, 200, 270, 270, 340, 340, 340, 340, 410, 410, 410, 410, 410, 410, 401, 410, 480, 480, 480,
+	480, 480, 480, 480, 480, 480, 480, 480, 480, 480, 480, 480, 460,
 ];
-
-
-const showArray = true; // Justus
 
 
 export default class Heap extends Algorithm {
@@ -158,7 +154,8 @@ export default class Heap extends Algorithm {
 			this.arrayLabels[i] = this.nextIndex++;
 			this.arrayRects[i] = this.nextIndex++;
 			this.circleObjs[i] = this.nextIndex++;
-			if (showArray && i > 0) {
+			if (global.jpshowHashArray) {
+				if (i > 0) {
 			this.cmd(
 				act.createRectangle,
 				this.arrayRects[i],
@@ -176,6 +173,7 @@ export default class Heap extends Algorithm {
 				ARRAY_LABEL_Y_POS,
 			);
 			this.cmd(act.setForegroundColor, this.arrayLabels[i], '#668721');
+				}
 			}
 		}
 		// this.cmd(act.setText, this.arrayRects[0], 'null');
@@ -193,7 +191,7 @@ export default class Heap extends Algorithm {
 		this.resetIndex = this.nextIndex;
 		this.createArray();
 		this.cmd(act.createLabel, this.descriptLabel1, '', 20, 10, 0);
-		this.cmd(act.createLabel, this.descriptLabel3, '', 300, 10, 0);
+		this.cmd(act.createLabel, this.descriptLabel3, '', 20, 40, 0);
 		this.animationManager.startNewAnimation(this.commands);
 		this.animationManager.skipForward();
 		this.animationManager.clearHistory();
@@ -249,7 +247,7 @@ export default class Heap extends Algorithm {
 		this.commands = [];
 		while (this.currentHeapSize > 0) {
 			this.cmd(act.delete, this.circleObjs[this.currentHeapSize]);
-			if (showArray) {
+			if (global.jpshowHashArray) {
 			this.cmd(act.setText, this.arrayRects[this.currentHeapSize], '');
 			}
 			this.currentHeapSize--;
@@ -279,13 +277,13 @@ export default class Heap extends Algorithm {
 	}
 
 	swap(index1, index2) {
-	        if (showArray) {
+	        if (global.jpshowHashArray) {
 		this.cmd(act.setText, this.arrayRects[index1], '');
 		this.cmd(act.setText, this.arrayRects[index2], '');
 		}
 		this.cmd(act.setText, this.circleObjs[index1], '');
 		this.cmd(act.setText, this.circleObjs[index2], '');
-		if (showArray) {
+		if (global.jpshowHashArray) {
 		this.cmd(
 			act.createLabel,
 			this.swapLabel1,
@@ -315,7 +313,7 @@ export default class Heap extends Algorithm {
 			HEAP_X_POSITIONS[index2],
 			HEAP_Y_POSITIONS[index2],
 		);
-		if (showArray) {
+		if (global.jpshowHashArray) {
 		this.cmd(act.move, this.swapLabel1, this.arrayXPositions[index2], ARRAY_Y_POS);
 		this.cmd(act.move, this.swapLabel2, this.arrayXPositions[index1], ARRAY_Y_POS);
 		}
@@ -325,13 +323,13 @@ export default class Heap extends Algorithm {
 		this.arrayData[index1] = this.arrayData[index2];
 		this.arrayData[index2] = tmp;
 		this.cmd(act.step);
-		if (showArray) {
+		if (global.jpshowHashArray) {
 		this.cmd(act.setText, this.arrayRects[index1], this.arrayData[index1]);
 		this.cmd(act.setText, this.arrayRects[index2], this.arrayData[index2]);
 		}
 		this.cmd(act.setText, this.circleObjs[index1], this.arrayData[index1]);
 		this.cmd(act.setText, this.circleObjs[index2], this.arrayData[index2]);
-		if (showArray) {
+		if (global.jpshowHashArray) {
 		this.cmd(act.delete, this.swapLabel1);
 		this.cmd(act.delete, this.swapLabel2);
 		}
@@ -341,7 +339,7 @@ export default class Heap extends Algorithm {
 
 	setIndexHighlight(index, highlightVal) {
 		this.cmd(act.setHighlight, this.circleObjs[index], highlightVal);
-		if (showArray) {
+		if (global.jpshowHashArray) {
 		this.cmd(act.setHighlight, this.arrayRects[index], highlightVal);
 		}
 	}
@@ -353,7 +351,7 @@ export default class Heap extends Algorithm {
 			childIndex = 2 * index;
 
 			if (index * 2 + 1 <= this.currentHeapSize) {
-				this.cmd(act.setText, this.descriptLabel3, `Finding ${this.order} of two children`);
+				this.cmd(act.setText, this.descriptLabel3, `finding ${this.order} of two children`);
 				this.setIndexHighlight(2 * index, 1);
 				this.setIndexHighlight(2 * index + 1, 1);
 				this.cmd(act.step);
@@ -363,7 +361,7 @@ export default class Heap extends Algorithm {
 					childIndex = 2 * index + 1;
 				}
 			}
-			this.cmd(act.setText, this.descriptLabel3, `Comparing child to parent`);
+			this.cmd(act.setText, this.descriptLabel3, `comparing child to parent`);
 			this.setIndexHighlight(index, 1);
 			this.setIndexHighlight(childIndex, 1);
 			this.cmd(act.step);
@@ -416,7 +414,7 @@ export default class Heap extends Algorithm {
 			return this.commands;
 		}
 
-		this.cmd(act.setText, this.descriptLabel1, 'Removing Element:');
+		this.cmd(act.setText, this.descriptLabel1, 'removing element:');
 		this.cmd(
 			act.createLabel,
 			this.descriptLabel2,
@@ -429,10 +427,10 @@ export default class Heap extends Algorithm {
 		this.cmd(act.move, this.descriptLabel2, 300, 40);
 		this.cmd(act.step);
 		this.cmd(act.delete, this.descriptLabel2);
-		this.cmd(act.setText, this.descriptLabel1, 'Removing Element: ' + this.arrayData[1]);
+		this.cmd(act.setText, this.descriptLabel1, 'removing element: ' + this.arrayData[1]);
 		this.arrayData[1] = '';
 		if (this.currentHeapSize > 1) {
-		        if (showArray) {
+		        if (global.jpshowHashArray) {
 			this.cmd(act.setText, this.arrayRects[1], '');
 			this.cmd(act.setText, this.arrayRects[this.currentHeapSize], '');
 			}
@@ -441,7 +439,7 @@ export default class Heap extends Algorithm {
 			this.currentHeapSize--;
 			this.pushDown(1);
 		} else {
-		        if (showArray) {
+		        if (global.jpshowHashArray) {
 			this.cmd(act.setText, this.arrayRects[1], '');
 			}
 			this.cmd(act.delete, this.circleObjs[this.currentHeapSize]);
@@ -460,12 +458,12 @@ export default class Heap extends Algorithm {
 		this.arrayData.unshift(0); // Add a 0 to start of array
 
 		this.currentHeapSize = this.arrayData.length - 1;
-		const size = Math.min(MAX_SIZE, this.currentHeapSize * 2 + 1);
-		if (this.array_size !== size) {
-			this.commands = this.resize(size, false);
-		}
+		// const size = Math.min(MAX_SIZE, this.currentHeapSize * 2 + 1);
+		// if (this.array_size !== size) {
+		// 	this.commands = this.resize(size, false);
+		// }
 
-		this.cmd(act.setText, this.descriptLabel1, 'Adding data to array');
+		this.cmd(act.setText, this.descriptLabel1, 'adding data to array');
 
 		this.cmd(act.step);
 
@@ -477,7 +475,7 @@ export default class Heap extends Algorithm {
 				HEAP_X_POSITIONS[i],
 				HEAP_Y_POSITIONS[i],
 			);
-			if (showArray) {
+			if (global.jpshowHashArray) {
 			this.cmd(act.setText, this.arrayRects[i], this.arrayData[i]);
 			}
 			if (i > 1) {
@@ -485,14 +483,14 @@ export default class Heap extends Algorithm {
 			}
 		}
 		this.cmd(act.step);
-		this.cmd(act.setText, this.descriptLabel1, 'Enforcing order property using downheap');
+		this.cmd(act.setText, this.descriptLabel1, 'ensuring heap order by sinking');
 		let nextElem = this.currentHeapSize;
 		while (nextElem > 0) {
 			this.pushDown(nextElem);
 			nextElem = nextElem - 1;
 		}
 		this.cmd(act.step);
-		this.cmd(act.setText, this.descriptLabel1, 'Buildheap complete!');
+		this.cmd(act.setText, this.descriptLabel1, 'bottom-up heap construction complete');
 		return this.commands;
 	}
 
@@ -516,9 +514,9 @@ export default class Heap extends Algorithm {
 			}
 		}
 
-		this.cmd(act.setText, this.descriptLabel1, 'Enqueueing Element: ' + insertedValue);
+		this.cmd(act.setText, this.descriptLabel1, 'inserting element: ' + insertedValue);
 		this.cmd(act.step);
-		this.cmd(act.setText, this.descriptLabel1, 'Enqueueing Element: ');
+		this.cmd(act.setText, this.descriptLabel1, 'inserting element: ');
 		this.currentHeapSize++;
 		this.arrayData[this.currentHeapSize] = insertedValue;
 		this.cmd(
@@ -547,7 +545,7 @@ export default class Heap extends Algorithm {
 		this.cmd(act.step);
 		this.cmd(act.setText, this.circleObjs[this.currentHeapSize], insertedValue);
 		this.cmd(act.delete, this.descriptLabel2);
-		if (showArray) {
+		if (global.jpshowHashArray) {
 		this.cmd(act.setText, this.arrayRects[this.currentHeapSize], insertedValue);
 		}
 
@@ -557,7 +555,7 @@ export default class Heap extends Algorithm {
 		if (currentIndex > 1) {
 			this.setIndexHighlight(currentIndex, 1);
 			this.setIndexHighlight(parentIndex, 1);
-			this.cmd(act.setText, this.descriptLabel3, `Comparing child to parent`);
+			this.cmd(act.setText, this.descriptLabel3, `comparing child to parent`);
 			this.cmd(act.step);
 			this.setIndexHighlight(currentIndex, 0);
 			this.setIndexHighlight(parentIndex, 0);
@@ -570,7 +568,7 @@ export default class Heap extends Algorithm {
 			if (currentIndex > 1) {
 				this.setIndexHighlight(currentIndex, 1);
 				this.setIndexHighlight(parentIndex, 1);
-				this.cmd(act.setText, this.descriptLabel3, `Comparing child to parent`);
+				this.cmd(act.setText, this.descriptLabel3, `comparing child to parent`);
 				this.cmd(act.step);
 				this.setIndexHighlight(currentIndex, 0);
 				this.setIndexHighlight(parentIndex, 0);
@@ -637,11 +635,11 @@ export default class Heap extends Algorithm {
 				this.cmd(
 					act.createLabel,
 					this.newArrayLabels[i],
-					i,
+					i - 1,
 					this.newArrayXPositions[i],
 					ARRAY_RESIZE_LABEL_Y_POS,
 				);
-				this.cmd(act.setForegroundColor, this.newArrayLabels[i], '#0000FF');
+				this.cmd(act.setForegroundColor, this.newArrayLabels[i], '#668721');
 			}
 			this.cmd(act.step);
 
@@ -680,7 +678,7 @@ export default class Heap extends Algorithm {
 				this.cmd(act.setText, this.newArrayRects[i], this.newArrayData[i]);
 			}
 
-			this.cmd(act.setText, this.newArrayRects[0], 'null');
+			// this.cmd(act.setText, this.newArrayRects[0], 'null');
 
 			this.cmd(act.step);
 		}
@@ -719,13 +717,13 @@ export default class Heap extends Algorithm {
 				this.cmd(
 					act.createLabel,
 					this.arrayLabels[i],
-					i,
+					i - 1,
 					this.arrayXPositions[i],
 					ARRAY_LABEL_Y_POS,
 				);
-				this.cmd(act.setForegroundColor, this.newArrayLabels[i], '#0000FF');
+				this.cmd(act.setForegroundColor, this.newArrayLabels[i], '#668721');
 			}
-			this.cmd(act.setText, this.arrayRects[0], 'null');
+			// this.cmd(act.setText, this.arrayRects[0], 'null');
 		}
 
 		return this.commands;
