@@ -28,28 +28,28 @@ import Algorithm, { addControlToAlgorithmBar, addDivisorToAlgorithmBar } from '.
 import { act } from '../anim/AnimationMain';
 
 const LINKED_LIST_START_X = 100;
-const LINKED_LIST_START_Y = 200;
+const LINKED_LIST_START_Y = 250;
 const LINKED_LIST_ELEM_WIDTH = 70;
 const LINKED_LIST_ELEM_HEIGHT = 30;
 
 const LINKED_LIST_INSERT_X = 250;
-const LINKED_LIST_INSERT_Y = 50;
+const LINKED_LIST_INSERT_Y = 90;
 
 const LINKED_LIST_ELEMS_PER_LINE = 8;
 const LINKED_LIST_ELEM_SPACING = 100;
 const LINKED_LIST_LINE_SPACING = 100;
 
 const TOP_POS_X = 180;
-const TOP_POS_Y = 100;
+const TOP_POS_Y = 150;
 const TOP_LABEL_X = 120;
-const TOP_LABEL_Y = 100;
+const TOP_LABEL_Y = 150;
 
 const TOP_ELEM_WIDTH = 30;
 const TOP_ELEM_HEIGHT = 30;
 
-const PUSH_LABEL_X = 100;
+const PUSH_LABEL_X = 130;
 const PUSH_LABEL_Y = 30;
-const PUSH_ELEMENT_X = 200;
+const PUSH_ELEMENT_X = 250;
 const PUSH_ELEMENT_Y = 30;
 
 const CODE_START_X = 400;
@@ -123,7 +123,7 @@ export default class StackLL extends Algorithm {
 		this.top = 0;
 		this.leftoverLabelID = this.nextIndex++;
 
-		this.cmd(act.createLabel, this.topLabelID, 'Head', TOP_LABEL_X, TOP_LABEL_Y);
+		this.cmd(act.createLabel, this.topLabelID, 'head', TOP_LABEL_X, TOP_LABEL_Y);
 		this.cmd(
 			act.createRectangle,
 			this.topID,
@@ -135,8 +135,9 @@ export default class StackLL extends Algorithm {
 		);
 		this.cmd(act.setNull, this.topID, 1);
 
-		this.cmd(act.createLabel, this.leftoverLabelID, '', PUSH_LABEL_X, PUSH_LABEL_Y);
+		this.cmd(act.createLabel, this.leftoverLabelID, '', PUSH_LABEL_X + global.jpleftoveroff, PUSH_LABEL_Y);
 
+		/* Justus
 		this.code = [
 			['procedure push(data)'],
 			['     head = new node(data, head)'],
@@ -173,6 +174,7 @@ export default class StackLL extends Algorithm {
 				}
 			}
 		}
+		*/
 
 		this.animationManager.startNewAnimation(this.commands);
 		this.animationManager.skipForward();
@@ -238,7 +240,7 @@ export default class StackLL extends Algorithm {
 			1,
 		);
 
-		this.cmd(act.createLabel, labPushID, 'Pushing Value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
+		this.cmd(act.createLabel, labPushID, 'pushing value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
 		this.cmd(act.createLabel, labPushValID, elemToPush, PUSH_ELEMENT_X, PUSH_ELEMENT_Y);
 
 		this.cmd(act.step);
@@ -281,7 +283,7 @@ export default class StackLL extends Algorithm {
 
 		this.cmd(act.setText, this.leftoverLabelID, '');
 
-		this.cmd(act.createLabel, labPopID, 'Popped Value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
+		this.cmd(act.createLabel, labPopID, 'popped value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
 		this.cmd(
 			act.createLabel,
 			labPopValID,
@@ -312,17 +314,17 @@ export default class StackLL extends Algorithm {
 
 		this.cmd(act.delete, labPopValID);
 		this.cmd(act.delete, labPopID);
-		this.cmd(act.setText, this.leftoverLabelID, 'Popped Value: ' + this.arrayData[this.top]);
+		this.cmd(act.setText, this.leftoverLabelID, 'popped value: ' + this.arrayData[this.top]);
 
 		return this.commands;
 	}
 
 	highlight(ind1, ind2) {
-		this.cmd(act.setForegroundColor, this.codeID[ind1][ind2], CODE_HIGHLIGHT_COLOR);
+		// Justus this.cmd(act.setForegroundColor, this.codeID[ind1][ind2], CODE_HIGHLIGHT_COLOR);
 	}
 
 	unhighlight(ind1, ind2) {
-		this.cmd(act.setForegroundColor, this.codeID[ind1][ind2], CODE_STANDARD_COLOR);
+		// Justus this.cmd(act.setForegroundColor, this.codeID[ind1][ind2], CODE_STANDARD_COLOR);
 	}
 
 	clearAll() {
