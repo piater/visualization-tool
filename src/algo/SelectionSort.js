@@ -289,7 +289,7 @@ export default class SelectionSort extends Algorithm {
 		this.cmd(
 			act.createHighlightCircle,
 			this.iPointerID,
-			'#FF8000',
+			this.jpc_highlight,
 			ARRAY_START_X + circleShift,
 			ARRAY_START_Y,
 		);

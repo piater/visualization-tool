@@ -450,7 +450,7 @@ export default class BTree extends Algorithm {
 					this.cmd(act.setText, this.messageID, 'Element ' + val + ' is not in the tree');
 				}
 			} else {
-				this.cmd(act.setTextColor, tree.graphicID, '#FF8000', i);
+				this.cmd(act.setTextColor, tree.graphicID, this.jpc_highlight, i);
 				this.cmd(act.setText, this.messageID, 'Element ' + val + ' found');
 				this.cmd(act.step);
 				this.cmd(act.setTextColor, tree.graphicID, FOREGROUND_COLOR, i);
@@ -1122,7 +1122,7 @@ export default class BTree extends Algorithm {
 					this.cmd(act.setHighlight, tree.graphicID, 0);
 				}
 			} else {
-				this.cmd(act.setTextColor, tree.graphicID, '#FF8000', i);
+				this.cmd(act.setTextColor, tree.graphicID, this.jpc_highlight, i);
 				this.cmd(act.step);
 				if (tree.isLeaf) {
 					this.cmd(act.setTextColor, tree.graphicID, FOREGROUND_COLOR, i);

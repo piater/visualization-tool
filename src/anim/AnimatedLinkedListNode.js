@@ -154,8 +154,8 @@ export default class AnimatedLinkedListNode extends AnimatedObject {
 		startY = this.top();
 
 		if (this.highlighted) {
-			context.strokeStyle = '#ff8000';
-			context.fillStyle = '#ff8000';
+			context.strokeStyle = this.jpc_highlight;
+			context.fillStyle = this.jpc_highlight;
 
 			context.beginPath();
 			context.moveTo(startX - this.highlightDiff, startY - this.highlightDiff);

@@ -295,8 +295,8 @@ export default class InsertionSort extends Algorithm {
 	}
 
 	swap(i, j) {
-		this.cmd(act.setForegroundColor, this.iPointerID, '#FF8000');
-		this.cmd(act.setForegroundColor, this.jPointerID, '#FF8000');
+		this.cmd(act.setForegroundColor, this.iPointerID, this.jpc_highlight);
+		this.cmd(act.setForegroundColor, this.jPointerID, this.jpc_highlight);
 		const iLabelID = this.nextIndex++;
 		const iXPos = i * ARRAY_ELEM_WIDTH + ARRAY_START_X;
 		const iYPos = ARRAY_START_Y;

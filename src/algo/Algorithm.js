@@ -24,6 +24,8 @@
 // authors and should not be interpreted as representing official policies, either expressed
 // or implied, of the University of San Francisco
 
+import '../jpcolors.js';
+
 import { act } from '../anim/AnimationMain';
 
 export function addLabelToAlgorithmBar(labelName, group) {
@@ -210,6 +212,8 @@ export default class Algorithm {
 		this.actionHistory = [];
 		this.recordAnimation = true;
 		this.commands = [];
+
+		this.jpc_highlight = global.jpc_highlight;
 	}
 
 	addCodeToCanvasBase(code, start_x, start_y, line_height, standard_color, layer) {

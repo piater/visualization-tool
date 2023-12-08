@@ -24,6 +24,8 @@
 // authors and should not be interpreted as representing official policies, either expressed
 // or implied, of the University of San Francisco
 
+import '../jpcolors.js';
+
 export default class AnimatedObject {
 	constructor() {
 		this.objectID = -1;
@@ -34,6 +36,8 @@ export default class AnimatedObject {
 		this.backgroundColor = '#FFFFFF';
 		this.foregroundColor = '#000000';
 		this.highlighted = false;
+
+		this.jpc_highlight = global.jpc_highlight;
 
 		this.label = '';
 		this.labelColor = '#000000';
@@ -88,7 +92,7 @@ export default class AnimatedObject {
 
 	setHighlight(value, color) {
 		this.highlighted = value;
-		this.highlightColor = color || '#ff8000';
+		this.highlightColor = color || this.jpc_highlight;
 	}
 
 	centerX() {

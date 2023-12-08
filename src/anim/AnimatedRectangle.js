@@ -189,8 +189,8 @@ export default class AnimatedRectangle extends AnimatedObject {
 		context.lineWidth = 2;
 
 		if (this.highlighted) {
-			context.strokeStyle = '#ff8000'; // Justus
-			context.fillStyle = '#ff8000';	 // Justus
+			context.strokeStyle = this.jpc_highlight;
+			context.fillStyle = this.jpc_highlight;
 
 			context.beginPath();
 			context.moveTo(startX - this.highlightDiff, startY - this.highlightDiff);

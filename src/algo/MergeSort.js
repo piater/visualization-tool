@@ -161,12 +161,16 @@ export default class MergeSort extends Algorithm {
 			['end procedure'],
 		];
 
-		this.codeID = this.addCodeToCanvasBase(this.code, CODE_START_X, CODE_START_Y);
+		// this.codeID = this.addCodeToCanvasBase(this.code, CODE_START_X, CODE_START_Y);
 
 		this.animationManager.startNewAnimation(this.commands);
 		this.animationManager.skipForward();
 		this.animationManager.clearHistory();
 	}
+
+	highlight() {}
+
+	unhighlight() {}
 
 	reset() {
 		this.nextIndex = 0;
@@ -557,7 +561,7 @@ export default class MergeSort extends Algorithm {
 
 	copyData(fromIndex, toIndex, fromOffset, toOffset, fromRow, toRow, value, cellID, pointerID) {
 		if (pointerID !== -1) {
-			this.cmd(act.setForegroundColor, pointerID, '#FF8000');
+			this.cmd(act.setForegroundColor, pointerID, this.jpc_highlight);
 			this.cmd(act.step);
 		}
 		const fromXPos = fromIndex * ARRAY_ELEM_WIDTH + ARRAY_START_X + fromOffset;

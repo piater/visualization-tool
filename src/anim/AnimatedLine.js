@@ -62,7 +62,7 @@ export default class AnimatedLine {
 
 	setHighlight(highlightVal, color) {
 		this.highlighted = highlightVal;
-		this.highlightColor = color || '#FF8000';
+		this.highlightColor = color || this.jpc_highlight;
 	}
 
 	setThickness(thickness) {

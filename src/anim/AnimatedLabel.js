@@ -84,8 +84,8 @@ export default class AnimatedLabel extends AnimatedObject {
 			context.textBaseline = 'top';
 		}
 		if (this.highlighted) {
-			context.strokeStyle = '#FF8000';
-			context.fillStyle = '#FF8000';
+			context.strokeStyle = this.jpc_highlight;
+			context.fillStyle = this.jpc_highlight;
 			context.lineWidth = this.highlightDiff;
 			context.strokeText(this.label, this.x, this.y);
 		}
@@ -104,8 +104,8 @@ export default class AnimatedLabel extends AnimatedObject {
 				);
 				const rightStr = this.label.substring(this.highlightIndex + 1);
 				context.fillText(leftStr, startingXForHighlight, this.y);
-				context.strokeStyle = '#FF8000';
-				context.fillStyle = '#FF8000';
+				context.strokeStyle = this.jpc_highlight;
+				context.fillStyle = this.jpc_highlight;
 				context.fillText(highlightStr, startingXForHighlight + this.leftWidth, this.y);
 
 				context.strokeStyle = this.labelColor;
