@@ -4,11 +4,13 @@
 	"private": true,
 	"homepage": "https://csvistool.com/",
 	"dependencies": {
+		"@bokeh/canvas2svg": "^1.0.22",
 		"@emotion/react": "^11.10.5",
 		"@emotion/styled": "^11.10.5",
 		"@mui/material": "5.11.7",
 		"@mui/styles": "^5.11.7",
 		"babel-eslint": "^10.1.0",
+		"file-saver": "^2.0.5",
 		"gh-pages": "^2.1.1",
 		"prop-types": "^15.7.2",
 		"react": "^18.2.0",
