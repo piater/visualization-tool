@@ -43,6 +43,7 @@ export default class AnimatedLabel extends AnimatedObject {
 		this.leftWidth = -1;
 		this.centerWidth = -1;
 		this.highlightIndex = -1;
+		this.alwaysOnTop = 1;
 	}
 
 	centered() {

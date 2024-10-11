@@ -491,6 +491,8 @@ export default class MergeSort extends Algorithm {
 		this.highlight(17, 0);
 		this.cmd(act.step);
 		this.unhighlight(17, 0);
+	  if (i < mid) {
+		this.cmd(act.delete, jPointerID);
 		while (i < mid) {
 			this.highlight(18, 0);
 			this.copyData(
@@ -519,6 +521,10 @@ export default class MergeSort extends Algorithm {
 			this.unhighlight(19, 0);
 			this.unhighlight(20, 0);
 		}
+		this.cmd(act.delete, iPointerID);
+	  }
+	  else {
+		this.cmd(act.delete, iPointerID);
 		this.highlight(22, 0);
 		this.cmd(act.step);
 		this.unhighlight(22, 0);
@@ -553,8 +559,8 @@ export default class MergeSort extends Algorithm {
 		}
 
 		// Delete pointers
-		this.cmd(act.delete, iPointerID);
 		this.cmd(act.delete, jPointerID);
+	  }
 		this.cmd(act.delete, kPointerID);
 		this.cmd(act.step);
 	}

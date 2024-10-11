@@ -179,7 +179,7 @@ export default class OpenHash extends Hash {
 		}
 
 		const labID = this.nextIndex++;
-		this.cmd(act.createLabel, labID, elem, 20, 25);
+		this.cmd(act.createLabel, labID, elem, 100, 60);
 		this.cmd(act.move, labID, this.indexXPos[index], this.indexYPos[index] - ARRAY_ELEM_HEIGHT);
 		this.cmd(act.step);
 		this.cmd(act.delete, labID);

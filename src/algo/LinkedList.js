@@ -348,6 +348,7 @@ export default class LinkedList extends Algorithm {
 
 		this.cmd(act.createLabel, labPushID, 'Adding Value: ', PUSH_LABEL_X, PUSH_LABEL_Y);
 		this.cmd(act.createLabel, labPushValID, elemToAdd, PUSH_ELEMENT_X, PUSH_ELEMENT_Y);
+	  //this.cmd(act.bringToTop, labPushValID, 1);
 
 		this.cmd(act.step);
 

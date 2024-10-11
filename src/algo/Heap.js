@@ -527,7 +527,7 @@ export default class Heap extends Algorithm {
 			HEAP_Y_POSITIONS[this.currentHeapSize],
 		);
 
-		this.cmd(act.createLabel, this.descriptLabel2, insertedValue, 120, 45, 1);
+		this.cmd(act.createLabel, this.descriptLabel2, insertedValue, 260, 20, 1);
 		if (this.currentHeapSize > 1) {
 			this.cmd(
 				act.connect,
